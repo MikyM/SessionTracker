@@ -1,0 +1,46 @@
+name: package-deploy
+
+on:
+  push:
+    branches:
+      - master
+      - release/*
+  pull_request:
+    branches: 
+      - master
+      - release/*
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: "!contains(format('{0} {1}', github.event.head_commit.message, github.event.pull_request.title), '[ci-skip]')"
+    steps:
+    - name: Setup .NET 6.0
+      uses: actions/setup-dotnet@v1
+      with:
+        source-url: https://nuget.pkg.github.com/MikyM/index.json
+        dotnet-version: 6.0.x
+      env:
+        NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    - name: Check out Code 
+      uses: actions/checkout@v2
+    - name: Build
+      run: |
+        cd src
+        dotnet restore
+        dotnet build -c Release --no-restore
+    - name: Run tests
+      run: |  
+        dotnet test -c Release --no-restore --no-build --verbosity minimal
+    - name: Generate base NuGet package
+      run: |  
+        cd /home/runner/work/SessionTracker/SessionTracker/src/SessionTracker
+        dotnet pack -c Release -o out --no-restore --no-restore --no-build
+    - name: Push generated base package to NuGet registry
+      run: dotnet nuget push ./SessionTracker/out/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+    - name: Generate Redis NuGet package
+      run: | 
+        cd /home/runner/work/SessionTracker/SessionTracker/src/SessionTracker.Redis
+        dotnet pack -c Release -o out -no-restore --no-restore --no-build
+    - name: Push generated Redis package to NuGet registry
+      run: dotnet nuget push ./SessionTracker.Redis/out/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
