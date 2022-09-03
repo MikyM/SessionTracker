@@ -27,7 +27,9 @@ jobs:
         dotnet restore
         dotnet build -c Release --no-restore
     - name: Run tests
-      run: dotnet test -c Release --no-restore --no-build --verbosity minimal
+      run: |
+        cd /home/runner/work/SessionTracker/SessionTracker/src
+        dotnet test -c Release --no-restore --no-build --verbosity minimal
     - name: Generate base NuGet package
       run: |  
         cd /home/runner/work/SessionTracker/SessionTracker/src/SessionTracker
