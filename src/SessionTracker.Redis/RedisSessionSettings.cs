@@ -28,7 +28,7 @@ public class RedisSessionSettings
     /// <summary>
     /// The redis connection configuration, if any.
     /// </summary>
-    public Action<ConfigurationOptions>? RedisConfigurationOptions { get; set; }
+    public ConfigurationOptions? RedisConfigurationOptions { get; set; }
 
     /// <summary>
     /// The Redis instance name.

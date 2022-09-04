@@ -65,9 +65,7 @@ public static class RedisSessionSettingsExtensions
 
         if (multiplexer is null && redisOpt.RedisConfigurationOptions is not null)
         {
-            var redisConnOpt = new ConfigurationOptions();
-            redisOpt.RedisConfigurationOptions(redisConnOpt);
-            multiplexer = ConnectionMultiplexer.Connect(redisConnOpt);
+            multiplexer = ConnectionMultiplexer.Connect(redisOpt.RedisConfigurationOptions);
         }
 
         if (multiplexer is null)
