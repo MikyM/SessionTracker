@@ -346,7 +346,7 @@ public class SessionTracker : ISessionTracker
 
         try
         {
-            return await _dataProvider.RemoveAndGetAsync<TSession>(key,
+            return await _dataProvider.EvictAndGetAsync<TSession>(key,
                 _cacheSettings.GetEvictionAbsoluteExpirationOrDefault<TSession>() ??
                 throw new InvalidOperationException(), ct).ConfigureAwait(false);
         }

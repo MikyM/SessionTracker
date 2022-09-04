@@ -139,7 +139,7 @@ public interface ISessionTrackerDataProvider : IDisposable
     /// <param name="evictedExpiration">The evicted entry expiration time.</param>
     /// <typeparam name="TSession">Type of the session.</typeparam>
     /// <returns>The result of the operation that may or not have succeeded.</returns>
-    Task<Result<TSession>> RemoveAndGetAsync<TSession>(string key, TimeSpan evictedExpiration, CancellationToken ct = default)
+    Task<Result<TSession>> EvictAndGetAsync<TSession>(string key, TimeSpan evictedExpiration, CancellationToken ct = default)
         where TSession : Session;
 
     /// <summary>

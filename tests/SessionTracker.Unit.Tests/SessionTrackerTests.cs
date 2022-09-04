@@ -32,6 +32,7 @@ public class SessionTrackerTestsFixture
         => DataProviderMock.Reset();
 }
 
+[Trait("session-tracker", "base")]
 public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
 {
     private readonly SessionTrackerTestsFixture _fixture;
@@ -639,7 +640,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
         var returnedSession = _fixture.Session;
         
         _fixture.DataProviderMock.Setup(x =>
-            x.RemoveAndGetAsync<Session>(session.Key, ts!.Value,  cts.Token)).ReturnsAsync(returnedSession);
+            x.EvictAndGetAsync<Session>(session.Key, ts!.Value,  cts.Token)).ReturnsAsync(returnedSession);
 
         // Act 
         var result = await _fixture.Service.FinishAndGetAsync<Session>(session.Key, cts.Token);
@@ -649,7 +650,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
         Assert.NotNull(result.Entity);
         Assert.Equal(returnedSession, result.Entity);
         
-        _fixture.DataProviderMock.Verify(x => x.RemoveAndGetAsync<Session>(session.Key, ts!.Value, cts.Token), Times.Once);
+        _fixture.DataProviderMock.Verify(x => x.EvictAndGetAsync<Session>(session.Key, ts!.Value, cts.Token), Times.Once);
     }
     
     [Fact]
@@ -662,7 +663,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
         var ts = _fixture.SettingsMock.Object.Value.GetEvictionAbsoluteExpirationOrDefault<Session>();
 
         _fixture.DataProviderMock.Setup(x =>
-            x.RemoveAndGetAsync<Session>(_fixture.TestSessionKey, ts!.Value,  cts.Token)).ReturnsAsync(error);
+            x.EvictAndGetAsync<Session>(_fixture.TestSessionKey, ts!.Value,  cts.Token)).ReturnsAsync(error);
 
         // Act 
         var result = await _fixture.Service.FinishAndGetAsync<Session>(_fixture.TestSessionKey, cts.Token);
@@ -673,7 +674,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
         Assert.IsType<InvalidOperationError>(result.Error);
         Assert.Same(error, result.Error);
         
-        _fixture.DataProviderMock.Verify(x => x.RemoveAndGetAsync<Session>(_fixture.TestSessionKey, ts!.Value, cts.Token), Times.Once);
+        _fixture.DataProviderMock.Verify(x => x.EvictAndGetAsync<Session>(_fixture.TestSessionKey, ts!.Value, cts.Token), Times.Once);
     }
     
     [Fact]
@@ -683,7 +684,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
         _fixture.Reset();
         var ex = new InvalidOperationException();
         _fixture.DataProviderMock.Setup(x =>
-            x.RemoveAndGetAsync<Session>(It.IsAny<string>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>())).ThrowsAsync(ex);
+            x.EvictAndGetAsync<Session>(It.IsAny<string>(), It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>())).ThrowsAsync(ex);
 
         // Act 
         var result = await _fixture.Service.FinishAndGetAsync<Session>(_fixture.TestSessionKey, CancellationToken.None);

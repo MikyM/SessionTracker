@@ -6,6 +6,7 @@ using Xunit;
 namespace SessionTracker.Unit.Tests;
 
 [UsedImplicitly]
+[Trait("object", "session")]
 public class SessionTests
 {
     [Fact]

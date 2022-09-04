@@ -73,7 +73,7 @@ internal static class LuaScripts
     /// <summary>
     /// Script that DELS's the key only if it exists in evicted cache, also re-caches the DEL's key's value as an "regular" entry, can return the just evicted value.
     /// </summary>
-    internal const string ResumeMoveToRegularScript = (@"
+    internal const string RestoreMoveToRegularScript = (@"
                 local result = redis.call('HGET', KEYS[1], 'data')
                 if result == false then
                     return nil

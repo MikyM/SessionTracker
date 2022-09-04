@@ -109,6 +109,7 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
             return new ExceptionError(ex);
         }
     }
+    
 
     /// <inheritdoc />
     public async Task<Result> AddAsync<TSession>(TSession session, SessionEntryOptions options,
@@ -321,19 +322,19 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
     public async Task<Result> EvictAsync<TSession>(string key, TimeSpan evictedExpiration,
         CancellationToken ct = default) where TSession : Session
     {
-        var result = await RemoveAndGetPrivateAsync<TSession>(key, evictedExpiration, false, ct).ConfigureAwait(false);
+        var result = await EvictAndGetPrivateAsync<TSession>(key, evictedExpiration, false, ct).ConfigureAwait(false);
         return result.IsSuccess ? Result.FromSuccess() : Result.FromError(result);
     }
 
     /// <inheritdoc />
-    public async Task<Result<TSession>> RemoveAndGetAsync<TSession>(string key, TimeSpan evictedExpiration,
+    public async Task<Result<TSession>> EvictAndGetAsync<TSession>(string key, TimeSpan evictedExpiration,
         CancellationToken ct = default) where TSession : Session
     {
-        var result = await RemoveAndGetPrivateAsync<TSession>(key, evictedExpiration, true, ct).ConfigureAwait(false);
+        var result = await EvictAndGetPrivateAsync<TSession>(key, evictedExpiration, true, ct).ConfigureAwait(false);
         return result.IsDefined(out var session) ? session : Result<TSession>.FromError(result);
     }
 
-    private async Task<Result<TSession?>> RemoveAndGetPrivateAsync<TSession>(string key, TimeSpan evictedExpiration,
+    private async Task<Result<TSession?>> EvictAndGetPrivateAsync<TSession>(string key, TimeSpan evictedExpiration,
         bool getData, CancellationToken ct = default) where TSession : Session
     {
         ct.ThrowIfCancellationRequested();
@@ -379,7 +380,7 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
     public async Task<Result> RestoreAsync<TSession>(string key, SessionEntryOptions options,
         CancellationToken ct = default) where TSession : Session
     {
-        var result = await ResumeAndGetPrivateAsync<TSession>(key, options, false, ct).ConfigureAwait(false);
+        var result = await RestoreAndGetPrivateAsync<TSession>(key, options, false, ct).ConfigureAwait(false);
         return result.IsSuccess ? Result.FromSuccess() : Result.FromError(result);
     }
 
@@ -387,11 +388,11 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
     public async Task<Result<TSession>> RestoreAndGetAsync<TSession>(string key, SessionEntryOptions options,
         CancellationToken ct = default) where TSession : Session
     {
-        var result = await ResumeAndGetPrivateAsync<TSession>(key, options, true, ct).ConfigureAwait(false);
+        var result = await RestoreAndGetPrivateAsync<TSession>(key, options, true, ct).ConfigureAwait(false);
         return result.IsDefined(out var session) ? session : Result<TSession>.FromError(result);
     }
 
-    private async Task<Result<TSession?>> ResumeAndGetPrivateAsync<TSession>(string key, SessionEntryOptions options,
+    private async Task<Result<TSession?>> RestoreAndGetPrivateAsync<TSession>(string key, SessionEntryOptions options,
         bool getData,
         CancellationToken ct = default) where TSession : Session
     {
@@ -403,7 +404,7 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
 
             var absoluteExpiration = GetAbsoluteExpiration(creationTime, options);
 
-            var result = await _cache.ScriptEvaluateAsync(LuaScripts.ResumeMoveToRegularScript,
+            var result = await _cache.ScriptEvaluateAsync(LuaScripts.RestoreMoveToRegularScript,
                 new RedisKey[] { CreateEvictedKey<TSession>(key) },
                 new RedisValue[]
                 {
