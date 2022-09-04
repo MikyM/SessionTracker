@@ -8,7 +8,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A2F95228
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Unit.Tests", "..\tests\SessionTracker.Unit.Tests\SessionTracker.Unit.Tests.csproj", "{BCD7A270-89D0-468B-AC3C-F7FC0EC74417}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Redis.Unit.Tests", "SessionTracker.Redis.Unit.Tests\SessionTracker.Redis.Unit.Tests.csproj", "{212D657B-F5D8-4DE5-B641-25EFE2F1C636}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Redis.Unit.Tests", "..\tests\SessionTracker.Redis.Unit.Tests\SessionTracker.Redis.Unit.Tests.csproj", "{212D657B-F5D8-4DE5-B641-25EFE2F1C636}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
