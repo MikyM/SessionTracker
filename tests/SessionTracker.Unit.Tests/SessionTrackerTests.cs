@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Microsoft.Extensions.Options;
 using Moq;
 using Remora.Results;
@@ -9,6 +10,7 @@ using Xunit;
 
 namespace SessionTracker.Unit.Tests;
 
+[UsedImplicitly]
 public class SessionTrackerTestsFixture
 {
     public readonly Mock<ISessionTrackerDataProvider> DataProviderMock = new();
@@ -21,10 +23,10 @@ public class SessionTrackerTestsFixture
     {
         var opt = new SessionSettings();
         SettingsMock.Setup(x => x.Value).Returns(opt);
+        Service = new(DataProviderMock.Object, SettingsMock.Object);
     }
 
-    public SessionTracker Service
-        => new (DataProviderMock.Object, SettingsMock.Object);
+    public SessionTracker Service { get; }
 
     public void Reset()
         => DataProviderMock.Reset();

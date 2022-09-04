@@ -1,9 +1,11 @@
 ﻿using System;
+using JetBrains.Annotations;
 using Moq;
 using Xunit;
 
 namespace SessionTracker.Unit.Tests;
 
+[UsedImplicitly]
 public class SessionTests
 {
     [Fact]
