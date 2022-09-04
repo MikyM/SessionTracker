@@ -53,7 +53,7 @@ internal static class LuaScripts
                 redis.call('HSET', ARGV[3], 'data', result)
 
                 if ARGV[1] ~= '-1' then
-                  redis.call('EXPIRE', ARGV[5], ARGV[3])
+                  redis.call('EXPIRE', ARGV[3], ARGV[1])
                 end 
 
                 if ARGV[2] == '1' then
