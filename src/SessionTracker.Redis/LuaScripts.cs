@@ -42,7 +42,7 @@ internal static class LuaScripts
                 local result = redis.call('HGET', KEYS[1], 'data')
                 if result == false then
                     local evicted_result = redis.call('EXISTS', ARGV[3])
-                    if evicted_result ~= 0
+                    if evicted_result ~= 0 then
                       return '0'
                     end
                     return nil
@@ -76,7 +76,7 @@ internal static class LuaScripts
                 local result = redis.call('HGET', KEYS[1], 'data')
                 if result == false then
                   local regular_result = redis.call('EXISTS', ARGV[5])
-                  if regular_result ~= 0
+                  if regular_result ~= 0 then
                      return '0'
                   end
                   return nil
@@ -119,7 +119,7 @@ internal static class LuaScripts
 
                 if next(result) == nil then
                   local evicted_result = redis.call('EXISTS', ARGV[3])
-                  if evicted_result ~= 0
+                  if evicted_result ~= 0 then
                      return '0'
                   end
                   return nil
@@ -176,7 +176,7 @@ internal static class LuaScripts
 
                 if next(result) == nil then
                   local evicted_result = redis.call('EXISTS', ARGV[2])
-                  if evicted_result ~= 0
+                  if evicted_result ~= 0 then
                      return '0'
                   end
                   return nil
@@ -223,7 +223,7 @@ internal static class LuaScripts
                 local result = redis.call('HGET', KEYS[1], 'data')
                 if result == false then
                   local regular_result = redis.call('EXISTS', ARGV[1])
-                  if regular_result ~= 0
+                  if regular_result ~= 0 then
                      return '0'
                   end
                   return nil
