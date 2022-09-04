@@ -41,6 +41,10 @@ internal static class LuaScripts
     internal const string RemoveMoveToEvictedScript = (@"
                 local result = redis.call('HGET', KEYS[1], 'data')
                 if result == false then
+                    local evicted_result = redis.call('EXISTS', ARGV[3])
+                    if evicted_result ~= 0
+                      return '0'
+                    end
                     return nil
                 end
 
@@ -71,7 +75,11 @@ internal static class LuaScripts
     internal const string RestoreMoveToRegularScript = (@"
                 local result = redis.call('HGET', KEYS[1], 'data')
                 if result == false then
-                    return nil
+                  local regular_result = redis.call('EXISTS', ARGV[5])
+                  if regular_result ~= 0
+                     return '0'
+                  end
+                  return nil
                 end
 
                 redis.call('DEL', KEYS[1])
@@ -86,7 +94,8 @@ internal static class LuaScripts
     
     // KEYS[1] = = key
     // ARGV[1] = data - byte[]
-    // ARGV[4] = whether to return post update data - 0 for no or 1 for yes
+    // ARGV[2] = whether to return post update data - 0 for no or 1 for yes
+    // ARGV[3] = evicted key
     // this order should not change LUA script depends on it
     /// <summary>
     /// Script that HSET's the key's value only if it exists, refreshes the expiration, can return the just updated key's value.
@@ -109,6 +118,10 @@ internal static class LuaScripts
                 local result = sub(KEYS[1])
 
                 if next(result) == nil then
+                  local evicted_result = redis.call('EXISTS', ARGV[3])
+                  if evicted_result ~= 0
+                     return '0'
+                  end
                   return nil
                 end
 
@@ -139,6 +152,7 @@ internal static class LuaScripts
 
     // KEYS[1] = = key
     // ARGV[1] = whether to return data or only refresh - 0 for no data, 1 to return data
+    // ARGV[2] = evicted key
     // this order should not change LUA script depends on it
     /// <summary>
     /// Script that HGET's the key's value only if it exists, refreshes the expiration, can return the value or not.
@@ -161,6 +175,10 @@ internal static class LuaScripts
                 local result = sub(KEYS[1])
 
                 if next(result) == nil then
+                  local evicted_result = redis.call('EXISTS', ARGV[2])
+                  if evicted_result ~= 0
+                     return '0'
+                  end
                   return nil
                 end
 
@@ -196,6 +214,7 @@ internal static class LuaScripts
                 return '1'");
     
     // KEYS[1] = = evicted key
+    // ARGV[1] = regular key
     // this order should not change LUA script depends on it
     /// <summary>
     /// Script that HGET's the key's value only if it exists in the evicted store
@@ -203,7 +222,11 @@ internal static class LuaScripts
     internal const string GetEvictedScript = (@"
                 local result = redis.call('HGET', KEYS[1], 'data')
                 if result == false then
-                    return nil
+                  local regular_result = redis.call('EXISTS', ARGV[1])
+                  if regular_result ~= 0
+                     return '0'
+                  end
+                  return nil
                 end
                 return result                  
                 ");
@@ -211,8 +234,9 @@ internal static class LuaScripts
     internal const string AbsoluteExpirationKey = "absexp";
     internal const string SlidingExpirationKey = "sldexp";
     internal const string DataKey = "data";
-    internal const string SuccessfulScriptNoDataReturnValue = "1";
-    internal const string NoKeyFoundScriptReturnValue = "nil";
+    internal const string SuccessfulScriptNoDataReturnedValue = "1";
+    internal const string UnsuccessfulScriptOtherCacheHasKeyReturnedValue = "0";
+    internal const string NoKeyFoundInAnyCacheReturnValue = "nil";
     internal const string ReturnDataArg = "1";
     internal const string DontReturnDataArg = "0";
     internal const long NotPresent = -1;

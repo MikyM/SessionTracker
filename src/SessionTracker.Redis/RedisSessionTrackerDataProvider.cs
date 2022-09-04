@@ -90,7 +90,7 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
         try
         {
             var result = await _cache.ScriptEvaluateAsync(LuaScripts.GetEvictedScript,
-                    new RedisKey[] { CreateEvictedKey<TSession>(key) })
+                    new RedisKey[] { CreateEvictedKey<TSession>(key) }, new RedisValue[] { CreateKey<TSession>(key) })
                 .ConfigureAwait(false);
 
             if (result.IsNull)
@@ -98,6 +98,9 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
 
             if (!result.TryExtractString(out var extracted))
                 return new UnexpectedRedisResultError(result);
+
+            if (extracted == LuaScripts.UnsuccessfulScriptOtherCacheHasKeyReturnedValue)
+                return new SessionAlreadyRestoredError();
 
             var deserializationResult = TryDeserialize<TSession>(extracted);
             return deserializationResult.IsDefined(out var session)
@@ -177,7 +180,11 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
         {
             var result = await _cache.ScriptEvaluateAsync(LuaScripts.GetAndRefreshScript,
                     new RedisKey[] { CreateKey<TSession>(key) },
-                    new RedisValue[] { getData ? LuaScripts.ReturnDataArg : LuaScripts.DontReturnDataArg })
+                    new RedisValue[]
+                    {
+                        getData ? LuaScripts.ReturnDataArg : LuaScripts.DontReturnDataArg,
+                        CreateEvictedKey<TSession>(key)
+                    })
                 .ConfigureAwait(false);
 
             if (result.IsNull)
@@ -186,10 +193,13 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
             if (!result.TryExtractString(out var extracted))
                 return new UnexpectedRedisResultError(result);
 
-            if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnValue)
+            if (extracted == LuaScripts.UnsuccessfulScriptOtherCacheHasKeyReturnedValue)
+                return new SessionAlreadyEvictedError();
+
+            if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnedValue)
                 return new UnexpectedRedisResultError(result);
 
-            if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnValue)
+            if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnedValue)
                 return Result<TSession?>.FromSuccess(null);
 
             var deserializationResult = TryDeserialize<TSession>(extracted);
@@ -254,7 +264,7 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
 
             var result = await _cache.ScriptEvaluateAsync(LuaScripts.UpdateExistsAndRefreshConditionalReturnLastScript,
                     new RedisKey[] { CreateKey<TSession>(session.Key) },
-                    new RedisValue[] { serialized, getData ? LuaScripts.ReturnDataArg : LuaScripts.DontReturnDataArg })
+                    new RedisValue[] { serialized, getData ? LuaScripts.ReturnDataArg : LuaScripts.DontReturnDataArg, CreateEvictedKey<TSession>(session.Key) })
                 .ConfigureAwait(false);
 
             if (result.IsNull)
@@ -262,11 +272,14 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
 
             if (!result.TryExtractString(out var extracted))
                 return new UnexpectedRedisResultError(result);
+            
+            if (extracted == LuaScripts.UnsuccessfulScriptOtherCacheHasKeyReturnedValue)
+                return new SessionAlreadyEvictedError();
 
-            if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnValue)
+            if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnedValue)
                 return new UnexpectedRedisResultError(result);
 
-            if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnValue)
+            if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnedValue)
                 return Result<TSession?>.FromSuccess(null);
 
             var deserializationResult = TryDeserialize<TSession>(extracted);
@@ -355,11 +368,14 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
 
             if (!result.TryExtractString(out var extracted))
                 return new UnexpectedRedisResultError(result);
+            
+            if (extracted == LuaScripts.UnsuccessfulScriptOtherCacheHasKeyReturnedValue)
+                return new SessionAlreadyEvictedError();
 
-            if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnValue)
+            if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnedValue)
                 return new UnexpectedRedisResultError(result);
 
-            if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnValue)
+            if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnedValue)
                 return Result<TSession?>.FromSuccess(null);
 
             var deserializationResult = TryDeserialize<TSession>(extracted);
@@ -417,11 +433,14 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
 
             if (!result.TryExtractString(out var extracted))
                 return new UnexpectedRedisResultError(result);
+            
+            if (extracted == LuaScripts.UnsuccessfulScriptOtherCacheHasKeyReturnedValue)
+                return new SessionAlreadyRestoredError();
 
-            if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnValue)
+            if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnedValue)
                 return new UnexpectedRedisResultError(result);
 
-            if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnValue)
+            if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnedValue)
                 return Result<TSession?>.FromSuccess(null);
 
             var deserializationResult = TryDeserialize<TSession>(extracted);
