@@ -44,11 +44,6 @@ internal static class LuaScripts
                     return nil
                 end
 
-                local evicted_result = redis.call('HGET', ARGV[3], 'data')
-                if evicted_result ~= false then
-                    return '0'
-                end
-
                 redis.call('DEL', KEYS[1])
 
                 redis.call('HSET', ARGV[3], 'data', result)
@@ -217,7 +212,6 @@ internal static class LuaScripts
     internal const string SlidingExpirationKey = "sldexp";
     internal const string DataKey = "data";
     internal const string SuccessfulScriptNoDataReturnValue = "1";
-    internal const string SuccessfulRemoveScriptEvictedExistsReturnValue = "0";
     internal const string NoKeyFoundScriptReturnValue = "nil";
     internal const string ReturnDataArg = "1";
     internal const string DontReturnDataArg = "0";

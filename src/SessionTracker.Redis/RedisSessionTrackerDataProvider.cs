@@ -362,9 +362,6 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
             if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnValue)
                 return Result<TSession?>.FromSuccess(null);
 
-            if (extracted == LuaScripts.SuccessfulRemoveScriptEvictedExistsReturnValue)
-                return new SessionAlreadyFinishedError();
-
             var deserializationResult = TryDeserialize<TSession>(extracted);
             return deserializationResult.IsDefined(out var session)
                 ? session
