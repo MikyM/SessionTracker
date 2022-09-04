@@ -5,7 +5,7 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>SessionTracker</PackageId>
-        <Version>2.0.1</Version>
+        <Version>2.0.2</Version>
         <Authors>Krzysztof Kupisz</Authors>
         <PackageDescription>Library that allows working with "sessions".</PackageDescription>
         <RepositoryUrl>https://github.com/MikyM/SessionTracker</RepositoryUrl>
@@ -15,9 +15,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>Test</_Parameter1>
-        </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>SessionTracker.Redis</_Parameter1>
         </AssemblyAttribute>
@@ -38,10 +35,6 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
       <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
       <PackageReference Include="Remora.Results" Version="7.2.2" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Redis" />
     </ItemGroup>
 
 </Project>

@@ -97,7 +97,7 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
                 return new NotFoundError($"The given key \"{key}\" held no session in the evicted cache.");
 
             if (!result.TryExtractString(out var extracted))
-                return new RedisErrors.UnexpectedRedisResultError(result);
+                return new UnexpectedRedisResultError(result);
 
             var deserializationResult = TryDeserialize<TSession>(extracted);
             return deserializationResult.IsDefined(out var session)
@@ -137,7 +137,7 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
                 }).ConfigureAwait(false);
 
             if (!result.TryExtractString(out var extracted))
-                return new RedisErrors.UnexpectedRedisResultError(result);
+                return new UnexpectedRedisResultError(result);
 
             if (extracted != "1")
             {
@@ -183,10 +183,10 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
                 return new NotFoundError($"The given key \"{key}\" held no session in the cache.");
 
             if (!result.TryExtractString(out var extracted))
-                return new RedisErrors.UnexpectedRedisResultError(result);
+                return new UnexpectedRedisResultError(result);
 
             if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnValue)
-                return new RedisErrors.UnexpectedRedisResultError(result);
+                return new UnexpectedRedisResultError(result);
 
             if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnValue)
                 return Result<TSession?>.FromSuccess(null);
@@ -260,10 +260,10 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
                 return new NotFoundError($"The given key \"{session.Key}\" held no session in the cache.");
 
             if (!result.TryExtractString(out var extracted))
-                return new RedisErrors.UnexpectedRedisResultError(result);
+                return new UnexpectedRedisResultError(result);
 
             if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnValue)
-                return new RedisErrors.UnexpectedRedisResultError(result);
+                return new UnexpectedRedisResultError(result);
 
             if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnValue)
                 return Result<TSession?>.FromSuccess(null);
@@ -353,10 +353,10 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
                 return new NotFoundError($"The given key \"{key}\" held no session in the cache.");
 
             if (!result.TryExtractString(out var extracted))
-                return new RedisErrors.UnexpectedRedisResultError(result);
+                return new UnexpectedRedisResultError(result);
 
             if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnValue)
-                return new RedisErrors.UnexpectedRedisResultError(result);
+                return new UnexpectedRedisResultError(result);
 
             if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnValue)
                 return Result<TSession?>.FromSuccess(null);
@@ -418,10 +418,10 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
                 return new NotFoundError($"The given key \"{key}\" held no session in the cache.");
 
             if (!result.TryExtractString(out var extracted))
-                return new RedisErrors.UnexpectedRedisResultError(result);
+                return new UnexpectedRedisResultError(result);
 
             if (!getData && extracted != LuaScripts.SuccessfulScriptNoDataReturnValue)
-                return new RedisErrors.UnexpectedRedisResultError(result);
+                return new UnexpectedRedisResultError(result);
 
             if (!getData && extracted == LuaScripts.SuccessfulScriptNoDataReturnValue)
                 return Result<TSession?>.FromSuccess(null);
@@ -448,7 +448,14 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
             _multiplexer.RegisterProfiler(_options.ProfilingSession);
     }
 
-    private static long? GetExpirationInSeconds(DateTimeOffset creationTime, DateTimeOffset? absoluteExpiration,
+    /// <summary>
+    /// Gets expiration time in seconds.
+    /// </summary>
+    /// <param name="creationTime">Creation time.</param>
+    /// <param name="absoluteExpiration">Absolute expiration.</param>
+    /// <param name="options">Options.</param>
+    /// <returns>Expiration time in seconds</returns>
+    public static long? GetExpirationInSeconds(DateTimeOffset creationTime, DateTimeOffset? absoluteExpiration,
         SessionEntryOptions options)
     {
         if (absoluteExpiration.HasValue && options.SlidingExpiration.HasValue)
@@ -471,7 +478,14 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
         return null;
     }
  
-    private static DateTimeOffset? GetAbsoluteExpiration(DateTimeOffset creationTime, SessionEntryOptions options)
+    /// <summary>
+    /// Gets absolute expiration.
+    /// </summary>
+    /// <param name="creationTime">Creation time.</param>
+    /// <param name="options">Options.</param>
+    /// <returns>Absolute expiration.</returns>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when absolute expiration time is not in the future.</exception>
+    public static DateTimeOffset? GetAbsoluteExpiration(DateTimeOffset creationTime, SessionEntryOptions options)
     {
         if (options.AbsoluteExpiration.HasValue && options.AbsoluteExpiration <= creationTime)
         {
@@ -489,7 +503,12 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
         return options.AbsoluteExpiration;
     }
 
-    private static long? GetEvictedExpirationInSeconds(TimeSpan expiration)
+    /// <summary>
+    /// Gets evicted expiration in seconds.
+    /// </summary>
+    /// <param name="expiration">Expiration time.</param>
+    /// <returns>Evicted expiration in seconds.</returns>
+    public static long? GetEvictedExpirationInSeconds(TimeSpan expiration)
         => expiration.TotalSeconds <= 0 ? null : (long)expiration.TotalSeconds;
     
     private Result<TSession> TryDeserialize<TSession>(string session) where TSession : Session
