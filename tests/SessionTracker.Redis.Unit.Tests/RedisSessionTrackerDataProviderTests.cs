@@ -107,7 +107,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
         _ = await _fixture.Service.GetEvictedAsync<Session>(_fixture.SessionKey, CancellationToken.None);
 
         // Assert
-        _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(It.Is<string>(y => y == LuaScripts.GetEvictedScript),
+        _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(It.Is<string>(y => y == LuaScripts.GetAndRefreshEvictedScript),
             It.IsAny<RedisKey[]?>(), It.IsAny<RedisValue[]?>(), CommandFlags.None));
     }
 
@@ -1262,7 +1262,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
 
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-            await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new TimeSpan(), cts.Token));
+            await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(), cts.Token));
     }
 
     [Fact]
@@ -1277,7 +1277,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
 
         // Act 
         var result =
-            await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new TimeSpan(), CancellationToken.None);
+            await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -1293,7 +1293,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
         _fixture.Reset();
 
         // Act 
-        _ = await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new TimeSpan(), CancellationToken.None);
+        _ = await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(), CancellationToken.None);
 
         // Assert
         _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(
@@ -1308,7 +1308,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
         _fixture.Reset();
 
         // Act 
-        _ = await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new TimeSpan(), CancellationToken.None);
+        _ = await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(), CancellationToken.None);
 
         // Assert
         _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(It.IsAny<string>(),
@@ -1328,7 +1328,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
 
         // Act 
         var result =
-            await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new TimeSpan(), CancellationToken.None);
+            await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -1346,7 +1346,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
                 CommandFlags.None)).ReturnsAsync(RedisResult.Create(new RedisValue("0")));
 
         // Act 
-        var result = await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new TimeSpan(),
+        var result = await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(),
             CancellationToken.None);
 
         // Assert
@@ -1367,7 +1367,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
 
         // Act 
         var result =
-            await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new TimeSpan(), CancellationToken.None);
+            await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(), CancellationToken.None);
 
         // Assert
         Assert.False(result.IsSuccess);
@@ -1380,19 +1380,23 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
     {
         // Arrange
         _fixture.Reset();
-        var exp = new TimeSpan(0, 0, 2, 0, 0);
-        var sec = RedisSessionTrackerDataProvider.GetEvictedExpirationInSeconds(exp);
+        var opt = new SessionEntryOptions();
+        var sld = new TimeSpan(0, 0, 2, 2, 0);
+        var abs = RedisSessionTrackerDataProvider.GetAbsoluteExpiration(DateTimeOffset.UtcNow, opt);
+        opt.SetSlidingExpiration(sld);
+        var absUnix = abs?.ToUnixTimeSeconds() ?? LuaScripts.NotPresent;
 
         // Act 
-        _ = await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, exp, CancellationToken.None);
+        _ = await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, opt, CancellationToken.None);
 
         // Assert
-        _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(LuaScripts.RemoveMoveToEvictedScript,
-            It.Is<RedisKey[]?>(y => y != null && y.Length == 1 && y[0] == _fixture.TestKey),
-            It.Is<RedisValue[]?>(y =>
-                y != null && y.Length == 3 && y[0] == sec && y[1] == LuaScripts.DontReturnDataArg &&
-                y[2] == _fixture.TestKeyEvicted),
-            It.IsAny<CommandFlags>()), Times.Once);
+        _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(It.IsAny<string>(),
+            It.IsAny<RedisKey[]?>(), It.Is<RedisValue[]?>(y =>
+                y != null && y.Length == 5 && y[0] == absUnix && y[1] == sld.TotalSeconds &&
+                y[2] == sld.TotalSeconds &&
+                y[3] == LuaScripts.DontReturnDataArg &&
+                y[4] == _fixture.TestKeyEvicted),
+            CommandFlags.None), Times.Once);
     }
 
     [Fact]
@@ -1400,8 +1404,12 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
     {
         // Arrange
         _fixture.Reset();
-        var exp = new TimeSpan(0, 0, 2, 0, 0);
-        var sec = RedisSessionTrackerDataProvider.GetEvictedExpirationInSeconds(exp);
+        var opt = new SessionEntryOptions();
+        var sld = new TimeSpan(0, 0, 2, 2, 0);
+        var abs = RedisSessionTrackerDataProvider.GetAbsoluteExpiration(DateTimeOffset.UtcNow, opt);
+        opt.SetSlidingExpiration(sld);
+        var absUnix = abs?.ToUnixTimeSeconds() ?? LuaScripts.NotPresent;
+        
         _fixture.DatabaseMock.Setup(x =>
                 x.ScriptEvaluateAsync(It.IsAny<string>(), It.IsAny<RedisKey[]?>(), It.IsAny<RedisValue[]?>(),
                     CommandFlags.None))
@@ -1409,17 +1417,18 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
                 ResultType.BulkString));
 
         // Act 
-        var result = await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, exp, CancellationToken.None);
+        var result = await _fixture.Service.EvictAsync<Session>(_fixture.SessionKey, opt, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
 
         _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(LuaScripts.RemoveMoveToEvictedScript,
-            It.Is<RedisKey[]?>(y => y != null && y.Length == 1 && y[0] == _fixture.TestKey),
-            It.Is<RedisValue[]?>(y =>
-                y != null && y.Length == 3 && y[0] == sec && y[1] == LuaScripts.DontReturnDataArg &&
-                y[2] == _fixture.TestKeyEvicted),
-            It.IsAny<CommandFlags>()), Times.Once);
+            It.Is<RedisKey[]?>(y => y != null && y.Length == 1 && y[0] == _fixture.TestKey), It.Is<RedisValue[]?>(y =>
+                y != null && y.Length == 5 && y[0] == absUnix && y[1] == sld.TotalSeconds &&
+                y[2] == sld.TotalSeconds &&
+                y[3] == LuaScripts.DontReturnDataArg &&
+                y[4] == _fixture.TestKeyEvicted),
+            CommandFlags.None), Times.Once);
     }
 
     [Fact]
@@ -1432,7 +1441,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
 
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-            await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new TimeSpan(), cts.Token));
+            await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(), cts.Token));
     }
 
     [Fact]
@@ -1447,7 +1456,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
 
         // Act 
         var result =
-            await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new TimeSpan(),
+            await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(),
                 CancellationToken.None);
 
         // Assert
@@ -1464,7 +1473,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
         _fixture.Reset();
 
         // Act 
-        _ = await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new TimeSpan(),
+        _ = await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(),
             CancellationToken.None);
 
         // Assert
@@ -1480,7 +1489,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
         _fixture.Reset();
 
         // Act 
-        _ = await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new TimeSpan(),
+        _ = await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(),
             CancellationToken.None);
 
         // Assert
@@ -1501,7 +1510,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
 
         // Act 
         var result =
-            await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new TimeSpan(),
+            await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(),
                 CancellationToken.None);
 
         // Assert
@@ -1520,7 +1529,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
                 CommandFlags.None)).ReturnsAsync(RedisResult.Create(new RedisValue("0")));
 
         // Act 
-        var result = await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new TimeSpan(),
+        var result = await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(),
             CancellationToken.None);
 
         // Assert
@@ -1540,7 +1549,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
 
         // Act 
         var result =
-            await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new TimeSpan(),
+            await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(),
                 CancellationToken.None);
 
         // Assert
@@ -1560,7 +1569,7 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
 
         // Act 
         var result =
-            await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new TimeSpan(),
+            await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, new SessionEntryOptions(),
                 CancellationToken.None);
 
         // Assert
@@ -1574,19 +1583,23 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
     {
         // Arrange
         _fixture.Reset();
-        var exp = new TimeSpan(0, 0, 2, 0, 0);
-        var sec = RedisSessionTrackerDataProvider.GetEvictedExpirationInSeconds(exp);
+        var opt = new SessionEntryOptions();
+        var sld = new TimeSpan(0, 0, 2, 2, 0);
+        var abs = RedisSessionTrackerDataProvider.GetAbsoluteExpiration(DateTimeOffset.UtcNow, opt);
+        opt.SetSlidingExpiration(sld);
+        var absUnix = abs?.ToUnixTimeSeconds() ?? LuaScripts.NotPresent;
 
         // Act 
-        _ = await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, exp, CancellationToken.None);
+        _ = await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, opt, CancellationToken.None);
 
         // Assert
         _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(It.IsAny<string>(),
-            It.IsAny<RedisKey[]?>(),
-            It.Is<RedisValue[]?>(y =>
-                y != null && y.Length == 3 && y[0] == sec && y[1] == LuaScripts.ReturnDataArg &&
-                y[2] == _fixture.TestKeyEvicted),
-            It.IsAny<CommandFlags>()), Times.Once);
+            It.IsAny<RedisKey[]?>(), It.Is<RedisValue[]?>(y =>
+                y != null && y.Length == 5 && y[0] == absUnix && y[1] == sld.TotalSeconds &&
+                y[2] == sld.TotalSeconds &&
+                y[3] == LuaScripts.ReturnDataArg &&
+                y[4] == _fixture.TestKeyEvicted),
+            CommandFlags.None), Times.Once);
     }
 
     [Fact]
@@ -1594,15 +1607,19 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
     {
         // Arrange
         _fixture.Reset();
-        var exp = new TimeSpan(0, 0, 2, 0, 0);
-        var sec = RedisSessionTrackerDataProvider.GetEvictedExpirationInSeconds(exp);
+        var opt = new SessionEntryOptions();
+        var sld = new TimeSpan(0, 0, 2, 2, 0);
+        var abs = RedisSessionTrackerDataProvider.GetAbsoluteExpiration(DateTimeOffset.UtcNow, opt);
+        opt.SetSlidingExpiration(sld);
+        var absUnix = abs?.ToUnixTimeSeconds() ?? LuaScripts.NotPresent;
+        
         _fixture.DatabaseMock.Setup(x =>
                 x.ScriptEvaluateAsync(It.IsAny<string>(), It.IsAny<RedisKey[]?>(), It.IsAny<RedisValue[]?>(),
                     CommandFlags.None))
             .ReturnsAsync(RedisResult.Create(new RedisValue(_fixture.Serialized), ResultType.BulkString));
 
         // Act 
-        var result = await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, exp, CancellationToken.None);
+        var result = await _fixture.Service.EvictAndGetAsync<Session>(_fixture.SessionKey, opt, CancellationToken.None);
 
         // Assert
         Assert.True(result.IsSuccess);
@@ -1610,11 +1627,12 @@ public class RedisSessionTrackerDataProviderTests : IClassFixture<RedisSessionTr
         Assert.Equal(_fixture.Session, result.Entity);
 
         _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(LuaScripts.RemoveMoveToEvictedScript,
-            It.Is<RedisKey[]?>(y => y != null && y.Length == 1 && y[0] == _fixture.TestKey),
-            It.Is<RedisValue[]?>(y =>
-                y != null && y.Length == 3 && y[0] == sec && y[1] == LuaScripts.ReturnDataArg &&
-                y[2] == _fixture.TestKeyEvicted),
-            It.IsAny<CommandFlags>()), Times.Once);
+            It.Is<RedisKey[]?>(y => y != null && y.Length == 1 && y[0] == _fixture.TestKey), It.Is<RedisValue[]?>(y =>
+                y != null && y.Length == 5 && y[0] == absUnix && y[1] == sld.TotalSeconds &&
+                y[2] == sld.TotalSeconds &&
+                y[3] == LuaScripts.ReturnDataArg &&
+                y[4] == _fixture.TestKeyEvicted),
+            CommandFlags.None), Times.Once);
     }
 
     [Fact]
