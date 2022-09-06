@@ -397,4 +397,28 @@ public class SessionSettings
 
         return cacheOptions;
     }
+    
+    /// <summary>
+    /// Gets a set of distributed cache options for evicted sessions, with expirations relative to now.
+    /// </summary>
+    /// <typeparam name="TSession">The session cache entry type.</typeparam>
+    /// <returns>The entry options.</returns>
+    public SessionEntryOptions GetEvictionSessionEntryOptions<TSession>() where TSession : Session
+    {
+        var cacheOptions = new SessionEntryOptions();
+
+        var absoluteExpiration = GetEvictionAbsoluteExpirationOrDefault<TSession>();
+        if (absoluteExpiration is not null)
+        {
+            cacheOptions.SetAbsoluteExpiration(absoluteExpiration.Value);
+        }
+
+        var slidingExpiration = GetEvictionSlidingExpirationOrDefault<TSession>();
+        if (slidingExpiration is not null && absoluteExpiration is not null)
+        {
+            cacheOptions.SetSlidingExpiration(slidingExpiration.Value);
+        }
+
+        return cacheOptions;
+    }
 }

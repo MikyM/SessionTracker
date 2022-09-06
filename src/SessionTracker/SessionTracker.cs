@@ -324,8 +324,7 @@ public class SessionTracker : ISessionTracker
         try
         {
             return await _dataProvider.EvictAsync<TSession>(key,
-                _cacheSettings.GetEvictionAbsoluteExpirationOrDefault<TSession>() ??
-                throw new InvalidOperationException(), ct).ConfigureAwait(false);
+                _cacheSettings.GetEvictionSessionEntryOptions<TSession>(), ct).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -347,8 +346,7 @@ public class SessionTracker : ISessionTracker
         try
         {
             return await _dataProvider.EvictAndGetAsync<TSession>(key,
-                _cacheSettings.GetEvictionAbsoluteExpirationOrDefault<TSession>() ??
-                throw new InvalidOperationException(), ct).ConfigureAwait(false);
+                _cacheSettings.GetEvictionSessionEntryOptions<TSession>(), ct).ConfigureAwait(false);
         }
         catch (Exception ex)
         {

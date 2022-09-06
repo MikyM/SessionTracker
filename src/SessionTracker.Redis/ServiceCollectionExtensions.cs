@@ -23,7 +23,6 @@
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Options;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
 using SessionTracker.Abstractions;

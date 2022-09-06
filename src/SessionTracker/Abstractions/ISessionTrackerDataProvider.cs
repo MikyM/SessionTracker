@@ -125,10 +125,10 @@ public interface ISessionTrackerDataProvider : IDisposable
     /// <remarks>This is guaranteed to be an atomic operation.</remarks>
     /// <param name="key">Session's key.</param>
     /// <param name="ct">Cancellation token.</param>
-    /// <param name="evictedExpiration">The evicted entry expiration time.</param>
+    /// <param name="options">The session's entry evicted options.</param>
     /// <typeparam name="TSession">Type of the session.</typeparam>
     /// <returns>The result of the operation that may or not have succeeded.</returns>
-    Task<Result> EvictAsync<TSession>(string key, TimeSpan evictedExpiration, CancellationToken ct = default) where TSession : Session;
+    Task<Result> EvictAsync<TSession>(string key, SessionEntryOptions options, CancellationToken ct = default) where TSession : Session;
 
     /// <summary>
     /// Attempts to remove a session associated with the given key, move it to the evicted backing store and return the removed value.
@@ -136,10 +136,10 @@ public interface ISessionTrackerDataProvider : IDisposable
     /// <remarks>This is guaranteed to be an atomic operation.</remarks>
     /// <param name="key">Session's key to remove.</param>
     /// <param name="ct">Cancellation token.</param>
-    /// <param name="evictedExpiration">The evicted entry expiration time.</param>
+    /// <param name="options">The session's entry evicted options.</param>
     /// <typeparam name="TSession">Type of the session.</typeparam>
     /// <returns>The result of the operation that may or not have succeeded.</returns>
-    Task<Result<TSession>> EvictAndGetAsync<TSession>(string key, TimeSpan evictedExpiration, CancellationToken ct = default)
+    Task<Result<TSession>> EvictAndGetAsync<TSession>(string key, SessionEntryOptions options, CancellationToken ct = default)
         where TSession : Session;
 
     /// <summary>

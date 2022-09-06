@@ -37,7 +37,7 @@ namespace SessionTracker.Redis;
 /// </summary>
 [UsedImplicitly]
 [PublicAPI]
-public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvider, IDisposable
+public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvider
 {
     private static readonly Version ServerVersionWithExtendedSetCommand = new(4, 0, 0);
  
@@ -89,7 +89,7 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
 
         try
         {
-            var result = await _cache.ScriptEvaluateAsync(LuaScripts.GetEvictedScript,
+            var result = await _cache.ScriptEvaluateAsync(LuaScripts.GetAndRefreshEvictedScript,
                     new RedisKey[] { CreateEvictedKey<TSession>(key) }, new RedisValue[] { CreateKey<TSession>(key) })
                 .ConfigureAwait(false);
 
@@ -332,33 +332,39 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
     }
 
     /// <inheritdoc />
-    public async Task<Result> EvictAsync<TSession>(string key, TimeSpan evictedExpiration,
+    public async Task<Result> EvictAsync<TSession>(string key, SessionEntryOptions options,
         CancellationToken ct = default) where TSession : Session
     {
-        var result = await EvictAndGetPrivateAsync<TSession>(key, evictedExpiration, false, ct).ConfigureAwait(false);
+        var result = await EvictAndGetPrivateAsync<TSession>(key, options, false, ct).ConfigureAwait(false);
         return result.IsSuccess ? Result.FromSuccess() : Result.FromError(result);
     }
 
     /// <inheritdoc />
-    public async Task<Result<TSession>> EvictAndGetAsync<TSession>(string key, TimeSpan evictedExpiration,
+    public async Task<Result<TSession>> EvictAndGetAsync<TSession>(string key, SessionEntryOptions options,
         CancellationToken ct = default) where TSession : Session
     {
-        var result = await EvictAndGetPrivateAsync<TSession>(key, evictedExpiration, true, ct).ConfigureAwait(false);
+        var result = await EvictAndGetPrivateAsync<TSession>(key, options, true, ct).ConfigureAwait(false);
         return result.IsDefined(out var session) ? session : Result<TSession>.FromError(result);
     }
 
-    private async Task<Result<TSession?>> EvictAndGetPrivateAsync<TSession>(string key, TimeSpan evictedExpiration,
+    private async Task<Result<TSession?>> EvictAndGetPrivateAsync<TSession>(string key, SessionEntryOptions options,
         bool getData, CancellationToken ct = default) where TSession : Session
     {
         ct.ThrowIfCancellationRequested();
 
         try
         {
+            var creationTime = DateTimeOffset.UtcNow;
+
+            var absoluteExpiration = GetAbsoluteExpiration(creationTime, options);
+            
             var result = await _cache.ScriptEvaluateAsync(LuaScripts.RemoveMoveToEvictedScript,
                 new RedisKey[] { CreateKey<TSession>(key) },
                 new RedisValue[]
                 {
-                    GetEvictedExpirationInSeconds(evictedExpiration) ?? LuaScripts.NotPresent,
+                    absoluteExpiration?.ToUnixTimeSeconds() ?? LuaScripts.NotPresent,
+                    options.SlidingExpiration?.TotalSeconds ?? LuaScripts.NotPresent,
+                    GetExpirationInSeconds(creationTime, absoluteExpiration, options) ?? LuaScripts.NotPresent,
                     getData ? LuaScripts.ReturnDataArg : LuaScripts.DontReturnDataArg,
                     CreateEvictedKey<TSession>(key)
                 }).ConfigureAwait(false);

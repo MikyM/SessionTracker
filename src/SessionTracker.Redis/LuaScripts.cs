@@ -31,9 +31,11 @@ internal static class LuaScripts
                 return '1'");
     
     // KEYS[1] = = key
-    // ARGV[1] = evicted absolute-expiration - number of seconds as long (-1 for none)
-    // ARGV[2] = whether to return existing data if applies - 0 for no or 1 for yes
-    // ARGV[3] = evicted key
+    // ARGV[1] = absolute-expiration - Unix timestamp in seconds as long (-1 for none)
+    // ARGV[2] = sliding-expiration - number of seconds as long (-1 for none)
+    // ARGV[3] = relative-expiration (long, in seconds, -1 for none) - Min(absolute-expiration - Now, sliding-expiration)
+    // ARGV[4] = whether to return existing data if applies - 0 for no or 1 for yes
+    // ARGV[5] = evicted key
     // this order should not change LUA script depends on it
     /// <summary>
     /// Script that DELS's the key only if it exists, also re-caches the DEL's key's value as an "evicted" entry, can return the just evicted value.
@@ -41,24 +43,20 @@ internal static class LuaScripts
     internal const string RemoveMoveToEvictedScript = (@"
                 local result = redis.call('HGET', KEYS[1], 'data')
                 if result == false then
-                    local evicted_result = redis.call('EXISTS', ARGV[3])
-                    if evicted_result ~= 0 then
-                      return '0'
-                    end
-                    return nil
+                  local evicted_result = redis.call('EXISTS', ARGV[5])
+                  if evicted_result ~= 0 then
+                     return '0'
+                  end
+                  return nil
                 end
 
                 redis.call('DEL', KEYS[1])
 
-                redis.call('HSET', ARGV[3], 'data', result)
+                redis.call('HSET', ARGV[5], 'absexp', ARGV[1], 'sldexp', ARGV[2], 'data', result)
 
-                if ARGV[1] ~= '-1' then
-                  redis.call('EXPIRE', ARGV[3], ARGV[1])
+                if ARGV[3] ~= '-1' then
+                  redis.call('EXPIRE', ARGV[5], ARGV[3])
                 end 
-
-                if ARGV[2] == '1' then
-                  return result
-                end           
 
                 return '1'");
     
@@ -87,7 +85,7 @@ internal static class LuaScripts
                 redis.call('HSET', ARGV[5], 'absexp', ARGV[1], 'sldexp', ARGV[2], 'data', result)
 
                 if ARGV[3] ~= '-1' then
-                  redis.call('EXPIRE', KEYS[1], ARGV[3])
+                  redis.call('EXPIRE', ARGV[5], ARGV[3])
                 end 
 
                 return '1'");
@@ -214,22 +212,67 @@ internal static class LuaScripts
                 return '1'");
     
     // KEYS[1] = = evicted key
-    // ARGV[1] = regular key
+    // ARGV[1] = whether to return existing data if applies - 0 for no or 1 for yes
+    // ARGV[2] = regular key
     // this order should not change LUA script depends on it
     /// <summary>
     /// Script that HGET's the key's value only if it exists in the evicted store
     /// </summary>
-    internal const string GetEvictedScript = (@"
-                local result = redis.call('HGET', KEYS[1], 'data')
-                if result == false then
-                  local regular_result = redis.call('EXISTS', ARGV[1])
+    internal const string GetAndRefreshEvictedScript = (@"
+                  local sub = function (key)
+                  local bulk = redis.call('HGETALL', key)
+	                 local result = {}
+	                 local nextkey
+	                 for i, v in ipairs(bulk) do
+		                 if i % 2 == 1 then
+			                 nextkey = v
+		                 else
+			                 result[nextkey] = v
+		                 end
+	                 end
+	                 return result
+                end
+
+                local result = sub(KEYS[1])
+
+                if next(result) == nil then
+                  local regular_result = redis.call('EXISTS', ARGV[2])
                   if regular_result ~= 0 then
                      return '0'
                   end
                   return nil
                 end
-                return result                  
-                ");
+
+                local sldexp = tonumber(result['sldexp'])
+                local absexp = tonumber(result['absexp'])
+
+                if sldexp == -1 then
+                  if ARGV[1] == '1' then
+                    return result['data']
+                  else
+                    return '1'
+                  end
+                end
+
+                local exp = 1
+                local time = tonumber(redis.call('TIME')[1])
+                if absexp ~= -1 then
+                  local relexp = absexp - time
+                  if relexp <= sldexp then
+                    exp = relexp
+                  else
+                    exp = sldexp                   
+                  end
+                else
+                  exp = sldexp
+                end
+                
+                redis.call('EXPIRE', KEYS[1], exp, 'XX')
+                                
+                if ARGV[1] == '1' then
+                  return result['data']
+                end
+                return '1'");
     
     internal const string AbsoluteExpirationKey = "absexp";
     internal const string SlidingExpirationKey = "sldexp";
