@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>SessionTracker.Redis</PackageId>
-        <Version>1.0.10</Version>
+        <Version>1.0.11</Version>
         <Authors>Krzysztof Kupisz</Authors>
         <PackageDescription>Sub library that adds Redis backing-store implementation for the SessionTracker.</PackageDescription>
         <RepositoryUrl>https://github.com/MikyM/SessionTracker</RepositoryUrl>
@@ -33,7 +33,7 @@
 
     <ItemGroup>
       <PackageReference Include="RedLock.net" Version="2.3.2" />
-      <PackageReference Include="StackExchange.Redis" Version="2.6.48" />
+      <PackageReference Include="StackExchange.Redis" Version="2.6.70" />
     </ItemGroup>
 
 </Project>

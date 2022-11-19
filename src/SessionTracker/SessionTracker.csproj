@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net6.0</TargetFramework>
+        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>SessionTracker</PackageId>
-        <Version>2.0.11</Version>
+        <Version>2.0.12</Version>
         <Authors>Krzysztof Kupisz</Authors>
         <PackageDescription>Library that allows working with "sessions".</PackageDescription>
         <RepositoryUrl>https://github.com/MikyM/SessionTracker</RepositoryUrl>
@@ -31,9 +31,9 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="JetBrains.Annotations" Version="2022.1.0" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Options" Version="6.0.0" />
+      <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+      <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
       <PackageReference Include="Remora.Results" Version="7.2.2" />
     </ItemGroup>
 
