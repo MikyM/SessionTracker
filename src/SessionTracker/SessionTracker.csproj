@@ -5,13 +5,15 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>SessionTracker</PackageId>
-        <Version>2.0.13</Version>
+        <Version>2.0.14</Version>
         <Authors>Krzysztof Kupisz</Authors>
         <PackageDescription>Library that allows working with "sessions".</PackageDescription>
         <RepositoryUrl>https://github.com/MikyM/SessionTracker</RepositoryUrl>
         <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
         <PackageReadmeFile>README.md</PackageReadmeFile>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <ItemGroup>
@@ -34,8 +36,8 @@
       <PackageReference Include="JetBrains.Annotations" Version="2022.3.1" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
       <PackageReference Include="Microsoft.Extensions.Options" Version="7.0.0" />
-      <PackageReference Include="Remora.Results" Version="7.2.2" />
-      <PackageReference Include="Remora.Results.Analyzers" Version="1.0.0-preview4" />
+      <PackageReference Include="Remora.Results" Version="7.2.3" />
+      <PackageReference Include="Remora.Results.Analyzers" Version="1.0.0" />
     </ItemGroup>
 
 </Project>
