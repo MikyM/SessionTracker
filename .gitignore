@@ -24,6 +24,14 @@ Bin/
 obj/
 Obj/
 
+src/.idea
+src/.vs
+/docs/_site
+/docs/api/*.yml
+/docs/api/.manifest
+/docs/obj
+*.html
+
 # Visual Studio 2015 cache/options directory
 .vs/
 /wwwroot/dist/

@@ -25,6 +25,10 @@ jobs:
         dotnet-version: 6.0.x
     - name: Check out Code 
       uses: actions/checkout@v3
+    - name: Install and cache PowerShell modules
+      uses: potatoqualitee/psmodulecache@v5.2
+      with:
+        modules-to-cache: powershell-yaml
     - name: Build
       run: |
         cd src
@@ -32,17 +36,38 @@ jobs:
         dotnet build -c Release --no-restore
     - name: Run tests
       run: |
-        cd /home/runner/work/SessionTracker/SessionTracker/src
+        cd src
         dotnet test -c Release --no-restore --no-build --verbosity minimal
-    - name: Generate base NuGet package
-      run: |  
-        cd /home/runner/work/SessionTracker/SessionTracker/src/SessionTracker
-        dotnet pack -c Release -o out --no-restore --no-build
-    - name: Push generated base package to NuGet registry
-      run: dotnet nuget push ./src/SessionTracker/out/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
-    - name: Generate Redis NuGet package
-      run: | 
-        cd /home/runner/work/SessionTracker/SessionTracker/src/SessionTracker.Redis
-        dotnet pack -c Release -o out --no-restore --no-build
-    - name: Push generated Redis package to NuGet registry
-      run: dotnet nuget push ./src/SessionTracker.Redis/out/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+
+    - name: Build Docs
+      run: dotnet tool restore && cd ./docs && dotnet docfx metadata
+    - name: Build Docs
+      shell: pwsh
+      run: cd ./docs && ./fix-nmsp.ps1 api\toc.yml
+    - name: Build Docs
+      run: cd ./docs && dotnet docfx build -f
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to private registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ secrets.DOCKER_REGISTRY }}
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    - name: Build and push to private registry
+      uses: docker/build-push-action@v2
+      with:
+        context: ./docs
+        push: true
+        tags: ${{ secrets.DOCKER_REGISTRY }}/docs-session-tracker:latest
+    - name: Sleep for 10 seconds
+      uses: jakejarvis/wait-action@master
+      with:
+        time: '10s'
+    - name: Trigger watchtower
+      uses: wei/curl@v1
+      with:
+        args: |
+          -H \"Authorization: Bearer ${{ secrets.WATCHTOWER_HTTP_API_TOKEN}}\" ${{ secrets.HOST_WATCHTOWER_API}}

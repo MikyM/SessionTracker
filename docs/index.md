@@ -45,10 +45,6 @@ services.AddSessionTrackerLockProvider(AnInstanceOfYourLockProvider);
 
 These will overwrite any other provider implementation currently registered with the container.
 
-## Documentation
-
-Documentation available at https://docs.session-tracker.mikym.me/.
-
 ## Example usage
 
 Create your own `Session` type:
