@@ -39,13 +39,13 @@ jobs:
         cd ./src/SessionTracker
         dotnet pack -c Release -o out --no-restore --no-build
     - name: Push generated base package to NuGet registry
-      run: dotnet nuget push ./src/SessionTracker/out/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/SessionTracker/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
     - name: Generate Redis NuGet package
       run: | 
         cd ./src/SessionTracker.Redis
         dotnet pack -c Release -o out --no-restore --no-build
     - name: Push generated Redis package to NuGet registry
-      run: dotnet nuget push ./src/SessionTracker.Redis/out/*.nupkg -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/SessionTracker.Redis/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
     - name: Build Docs
       run: dotnet tool restore && cd ./docs && dotnet docfx metadata
     - name: Build Docs
