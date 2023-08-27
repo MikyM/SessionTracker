@@ -47,7 +47,7 @@ These will overwrite any other provider implementation currently registered with
 
 ## Documentation
 
-Documentation available at https://docs.session-tracker.mikym.me/.
+Documentation available at https://session-tracker.mikym.me/.
 
 ## Example usage
 
