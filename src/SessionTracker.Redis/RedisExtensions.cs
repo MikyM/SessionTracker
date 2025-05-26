@@ -43,7 +43,7 @@ internal static class RedisExtensions
         
         if (redisResult.IsNull)
             return false;
-        if (redisResult.Type is not (ResultType.SimpleString or ResultType.BulkString))
+        if (redisResult.Resp3Type is not (ResultType.SimpleString or ResultType.BulkString))
             return false;
 
         extracted = (string)redisResult!;

@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>SessionTracker.Redis</PackageId>
@@ -35,7 +35,7 @@
 
     <ItemGroup>
       <PackageReference Include="RedLock.net" Version="2.3.2" />
-      <PackageReference Include="StackExchange.Redis" Version="2.6.86" />
+      <PackageReference Include="StackExchange.Redis" Version="2.8.37" />
     </ItemGroup>
 
 </Project>

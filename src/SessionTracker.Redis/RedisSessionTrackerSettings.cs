@@ -1,4 +1,5 @@
-﻿using JetBrains.Annotations;
+﻿using System.Text.Json;
+using JetBrains.Annotations;
 using StackExchange.Redis;
 using StackExchange.Redis.Profiling;
 
@@ -8,8 +9,13 @@ namespace SessionTracker.Redis;
 /// The Redis backing store session settings.
 /// </summary>
 [PublicAPI]
-public class RedisSessionSettings
+public class RedisSessionTrackerSettings
 {
+    /// <summary>
+    /// The JSON serializer configuration.
+    /// </summary>
+    public Action<JsonSerializerOptions>? JsonSerializerConfiguration { get; set; }
+    
     /// <summary>
     /// Gets the Session key storage prefix.
     /// </summary>

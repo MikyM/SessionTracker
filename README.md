@@ -1,6 +1,11 @@
-# SessionTracker
-
+[![NuGet](https://img.shields.io/nuget/v/SessionTracker)](https://www.nuget.org/packages/SessionTracker)[![NuGet](https://img.shields.io/nuget/dt/SessionTracker
+)](https://www.nuget.org/packages/SessionTracker)
 [![Build Status](https://github.com/MikyM/SessionTracker/actions/workflows/release.yml/badge.svg)](https://github.com/MikyM/SessionTracker/actions)
+![GitHub License](https://img.shields.io/github/license/MikyM/SessionTracker)
+[![Static Badge](https://img.shields.io/badge/Documentation-SessionTracker-Green)](https://mikym.github.io/SessionTracker)
+
+
+# SessionTracker
 
 Library that allows working with distributed "sessions".
 

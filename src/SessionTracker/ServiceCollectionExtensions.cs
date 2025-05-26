@@ -38,9 +38,9 @@ public static class ServiceCollectionExtensions
     /// <param name="services">The services.</param>
     /// <param name="sessionConfiguration">An action to configure the session options.</param>
     /// <returns>The services.</returns>
-    public static IServiceCollection AddSessionTracker
+    public static SessionTrackerBuilder AddSessionTracker
     (
-        this IServiceCollection services, Action<SessionSettings>? sessionConfiguration = null
+        this IServiceCollection services, Action<SessionTrackerSettings>? sessionConfiguration = null
     )
     {
         sessionConfiguration ??= x => x.SetAbsoluteExpiration<Session>(TimeSpan.FromSeconds(30));
@@ -49,68 +49,6 @@ public static class ServiceCollectionExtensions
         
         services.AddSingleton<ISessionTracker,SessionTracker>();
 
-        return services;
-    }
-    
-    /// <summary>
-    /// Adds a custom session tracking data provider.
-    /// </summary>
-    /// <param name="services">The services.</param>
-    /// <returns>The services.</returns>
-    public static IServiceCollection AddSessionTrackerDataProvider<TDataProvider>
-    (
-        this IServiceCollection services
-    ) where TDataProvider : class, ISessionTrackerDataProvider
-    {
-        services.AddSingleton<ISessionTrackerDataProvider, TDataProvider>();
-
-        return services;
-    }
-    
-    /// <summary>
-    /// Adds a custom session tracking lock provider.
-    /// </summary>
-    /// <param name="services">The services.</param>
-    /// <returns>The services.</returns>
-    public static IServiceCollection AddSessionTrackerLockProvider<TLockProvider>
-    (
-        this IServiceCollection services
-    ) where TLockProvider : class, ISessionLockProvider
-    {
-        services.AddSingleton<ISessionLockProvider, TLockProvider>();
-
-        return services;
-    }
-
-    /// <summary>
-    /// Adds a custom session tracking data provider.
-    /// </summary>
-    /// <param name="services">The services.</param>
-    /// <param name="instance">An instance of the provider.</param>
-    /// <returns>The services.</returns>
-    public static IServiceCollection AddSessionTrackerDataProvider<TDataProvider>
-    (
-        this IServiceCollection services, TDataProvider instance
-    ) where TDataProvider : class, ISessionTrackerDataProvider
-    {
-        services.AddSingleton<ISessionTrackerDataProvider>(instance);
-
-        return services;
-    }
-    
-    /// <summary>
-    /// Adds a custom session tracking lock provider.
-    /// </summary>
-    /// <param name="services">The services.</param>
-    /// <param name="instance">An instance of the provider.</param>
-    /// <returns>The services.</returns>
-    public static IServiceCollection AddSessionTrackerLockProvider<TLockProvider>
-    (
-        this IServiceCollection services, TLockProvider instance
-    ) where TLockProvider : class, ISessionLockProvider
-    {
-        services.AddSingleton<ISessionLockProvider>(instance);
-
-        return services;
+        return new SessionTrackerBuilder(services);
     }
 }

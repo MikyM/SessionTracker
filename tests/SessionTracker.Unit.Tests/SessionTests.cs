@@ -6,29 +6,33 @@ using Xunit;
 namespace SessionTracker.Unit.Tests;
 
 [UsedImplicitly]
-[Trait("object", "session")]
+[CollectionDefinition("Session")]
 public class SessionTests
 {
-    [Fact]
-    public void Session_Should_Have_Correct_Initial_State()
+    [Collection("Session")]
+    public class StateShould
     {
-        var now = DateTimeOffset.UtcNow;
-        var dt = new Mock<DateTimeProvider>();
-        dt.SetupGet(x => x.OffsetUtcNow).Returns(now);
-        DateTimeProvider.SetProvider(dt.Object);
+        [Fact]
+        public void BeCorrectUponCreation()
+        {
+            var now = DateTimeOffset.UtcNow;
+            var dt = new Mock<DateTimeProvider>();
+            dt.SetupGet(x => x.OffsetUtcNow).Returns(now);
+            DateTimeProvider.SetProvider(dt.Object);
         
-        // Arrange
-        var key = "test";
+            // Arrange
+            var key = "test";
         
-        // Act
-        var session = new Session("test");
+            // Act
+            var session = new Session("test");
         
-        // Assert
+            // Assert
         
-        Assert.Equal(key, session.Key);
-        Assert.Equal(1, session.Version);
-        Assert.Equal(now, session.StartedAt);
+            Assert.Equal(key, session.Key);
+            Assert.Equal(1, session.Version);
+            Assert.Equal(now, session.StartedAt);
         
-        DateTimeProvider.ResetToDefault();
+            DateTimeProvider.ResetToDefault();
+        }
     }
 }

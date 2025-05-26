@@ -37,7 +37,7 @@ namespace SessionTracker.Redis;
 /// </summary>
 [UsedImplicitly]
 [PublicAPI]
-public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvider
+public sealed class RedisDataProvider : ISessionTrackerDataProvider
 {
     private static readonly Version ServerVersionWithExtendedSetCommand = new(4, 0, 0);
  
@@ -49,25 +49,25 @@ public sealed class RedisSessionTrackerDataProvider : ISessionTrackerDataProvide
 
     private bool _disposed;
 
-    private readonly RedisSessionSettings _options;
+    private readonly RedisSessionTrackerSettings _options;
     private readonly string _instance;
-    private readonly ILogger<RedisSessionTrackerDataProvider> _logger;
+    private readonly ILogger<RedisDataProvider> _logger;
 
     private readonly SemaphoreSlim _connectionLock = new(1,1);
 
     /// <summary>
-    /// Initializes a new instance of <see cref="RedisSessionTrackerDataProvider"/>.
+    /// Initializes a new instance of <see cref="RedisDataProvider"/>.
     /// </summary>
     /// <param name="optionsAccessor">The configuration options.</param>
     /// <param name="multiplexer">Connection multiplexer.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="jsonOptions">Json options.</param>
     /// <param name="lockProvider">Lock factory.</param>
-    public RedisSessionTrackerDataProvider(IOptions<RedisSessionSettings> optionsAccessor, IConnectionMultiplexer multiplexer,
-        ILogger<RedisSessionTrackerDataProvider> logger, IOptionsMonitor<JsonSerializerOptions> jsonOptions,
+    public RedisDataProvider(IOptions<RedisSessionTrackerSettings> optionsAccessor, IConnectionMultiplexer multiplexer,
+        ILogger<RedisDataProvider> logger, IOptionsMonitor<JsonSerializerOptions> jsonOptions,
         ISessionLockProvider lockProvider)
     {
-        _jsonOptions = jsonOptions.Get(RedisSessionSettings.JsonSerializerName);
+        _jsonOptions = jsonOptions.Get(RedisSessionTrackerSettings.JsonSerializerName);
         _cache = multiplexer.GetDatabase();
         _multiplexer = multiplexer;
         _lockProvider = lockProvider;

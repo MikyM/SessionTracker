@@ -31,17 +31,17 @@ namespace SessionTracker;
 public class SessionTracker : ISessionTracker
 {
     private readonly ISessionTrackerDataProvider _dataProvider;
-    private readonly SessionSettings _cacheSettings;
+    private readonly SessionTrackerSettings _cacheTrackerSettings;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="SessionTracker"/> class.
     /// </summary>
     /// <param name="dataProvider">The cache provider.</param>
     /// <param name="cacheSettings">The cache settings.</param>
-    public SessionTracker(ISessionTrackerDataProvider dataProvider, IOptions<SessionSettings> cacheSettings)
+    public SessionTracker(ISessionTrackerDataProvider dataProvider, IOptions<SessionTrackerSettings> cacheSettings)
     {
         _dataProvider = dataProvider;
-        _cacheSettings = cacheSettings.Value;
+        _cacheTrackerSettings = cacheSettings.Value;
     }
 
     /// <inheritdoc />
@@ -85,7 +85,7 @@ public class SessionTracker : ISessionTracker
         try
         {
             var lockResult = await _dataProvider.LockAsync<TSession>(key,
-                    lockExpirationTime ?? _cacheSettings.GetLockExpirationOrDefault<TSession>(), ct)
+                    lockExpirationTime ?? _cacheTrackerSettings.GetLockExpirationOrDefault<TSession>(), ct)
                 .ConfigureAwait(false);
             if (!lockResult.IsDefined(out @lock))
                 return Result<ILockedSession<TSession>>.FromError(lockResult);
@@ -145,7 +145,7 @@ public class SessionTracker : ISessionTracker
         try
         {
             var lockResult = await _dataProvider.LockAsync<TSession>(key,
-                    _cacheSettings.GetLockExpirationOrDefault<TSession>(), lockWaitTime, lockRetryTime, ct)
+                    _cacheTrackerSettings.GetLockExpirationOrDefault<TSession>(), lockWaitTime, lockRetryTime, ct)
                 .ConfigureAwait(false);
             if (!lockResult.IsDefined(out @lock))
                 return Result<ILockedSession<TSession>>.FromError(lockResult);
@@ -173,7 +173,7 @@ public class SessionTracker : ISessionTracker
 
         try
         {
-            return await _dataProvider.AddAsync(session, _cacheSettings.GetSessionEntryOptions<TSession>(), ct)
+            return await _dataProvider.AddAsync(session, _cacheTrackerSettings.GetSessionEntryOptions<TSession>(), ct)
                 .ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -248,7 +248,7 @@ public class SessionTracker : ISessionTracker
         try
         {
             return await _dataProvider
-                .LockAsync<TSession>(key, lockExpirationTime ?? _cacheSettings.GetLockExpirationOrDefault<TSession>(),
+                .LockAsync<TSession>(key, lockExpirationTime ?? _cacheTrackerSettings.GetLockExpirationOrDefault<TSession>(),
                     ct).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -284,7 +284,7 @@ public class SessionTracker : ISessionTracker
 
         try
         {
-            return await _dataProvider.LockAsync<TSession>(key, _cacheSettings.GetLockExpirationOrDefault<TSession>(),
+            return await _dataProvider.LockAsync<TSession>(key, _cacheTrackerSettings.GetLockExpirationOrDefault<TSession>(),
                 lockWaitTime, lockRetryTime, ct).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -324,7 +324,7 @@ public class SessionTracker : ISessionTracker
         try
         {
             return await _dataProvider.EvictAsync<TSession>(key,
-                _cacheSettings.GetEvictionSessionEntryOptions<TSession>(), ct).ConfigureAwait(false);
+                _cacheTrackerSettings.GetEvictionSessionEntryOptions<TSession>(), ct).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -346,7 +346,7 @@ public class SessionTracker : ISessionTracker
         try
         {
             return await _dataProvider.EvictAndGetAsync<TSession>(key,
-                _cacheSettings.GetEvictionSessionEntryOptions<TSession>(), ct).ConfigureAwait(false);
+                _cacheTrackerSettings.GetEvictionSessionEntryOptions<TSession>(), ct).ConfigureAwait(false);
         }
         catch (Exception ex)
         {
@@ -367,7 +367,7 @@ public class SessionTracker : ISessionTracker
         try
         {
             return await _dataProvider.RestoreAsync<TSession>(key,
-                _cacheSettings.GetSessionEntryOptions<TSession>() ??
+                _cacheTrackerSettings.GetSessionEntryOptions<TSession>() ??
                 throw new InvalidOperationException(), ct).ConfigureAwait(false);
         }
         catch (Exception ex)
@@ -390,7 +390,7 @@ public class SessionTracker : ISessionTracker
         try
         {
             return await _dataProvider.RestoreAndGetAsync<TSession>(key,
-                _cacheSettings.GetSessionEntryOptions<TSession>() ??
+                _cacheTrackerSettings.GetSessionEntryOptions<TSession>() ??
                 throw new InvalidOperationException(), ct).ConfigureAwait(false);
         }
         catch (Exception ex)

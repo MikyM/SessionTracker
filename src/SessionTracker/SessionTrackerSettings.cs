@@ -26,7 +26,7 @@ namespace SessionTracker;
 /// Holds various settings for individual session objects.
 /// </summary>
 [PublicAPI]
-public class SessionSettings
+public class SessionTrackerSettings
 {
    
     /// <summary>
@@ -94,7 +94,7 @@ public class SessionSettings
     /// </summary>
     /// <param name="defaultAbsoluteExpiration">The default value.</param>
     /// <returns>The settings.</returns>
-    public SessionSettings SetDefaultAbsoluteExpiration(TimeSpan? defaultAbsoluteExpiration)
+    public SessionTrackerSettings SetDefaultAbsoluteExpiration(TimeSpan? defaultAbsoluteExpiration)
     {
         _defaultAbsoluteExpiration = defaultAbsoluteExpiration;
         return this;
@@ -105,7 +105,7 @@ public class SessionSettings
     /// </summary>
     /// <param name="defaultSlidingExpiration">The default value.</param>
     /// <returns>The settings.</returns>
-    public SessionSettings SetDefaultSlidingExpiration(TimeSpan? defaultSlidingExpiration)
+    public SessionTrackerSettings SetDefaultSlidingExpiration(TimeSpan? defaultSlidingExpiration)
     {
         _defaultSlidingExpiration = defaultSlidingExpiration;
         return this;
@@ -116,7 +116,7 @@ public class SessionSettings
     /// </summary>
     /// <param name="defaultLockExpiration">The default value.</param>
     /// <returns>The settings.</returns>
-    public SessionSettings SetDefaultLockExpiration(TimeSpan defaultLockExpiration)
+    public SessionTrackerSettings SetDefaultLockExpiration(TimeSpan defaultLockExpiration)
     {
         _defaultLockExpiration = defaultLockExpiration;
         return this;
@@ -127,7 +127,7 @@ public class SessionSettings
     /// </summary>
     /// <param name="wait">The default value.</param>
     /// <returns>The settings.</returns>
-    public SessionSettings SetDefaultLockWait(TimeSpan wait)
+    public SessionTrackerSettings SetDefaultLockWait(TimeSpan wait)
     {
         _defaultWait = wait;
         return this;
@@ -138,7 +138,7 @@ public class SessionSettings
     /// </summary>
     /// <param name="retry">The default value.</param>
     /// <returns>The settings.</returns>
-    public SessionSettings SetDefaultLockRetry(TimeSpan retry)
+    public SessionTrackerSettings SetDefaultLockRetry(TimeSpan retry)
     {
         _defaultRetry = retry;
         return this;
@@ -149,7 +149,7 @@ public class SessionSettings
     /// </summary>
     /// <param name="defaultAbsoluteExpiration">The default value.</param>
     /// <returns>The settings.</returns>
-    public SessionSettings SetDefaultEvictionAbsoluteExpiration(TimeSpan? defaultAbsoluteExpiration)
+    public SessionTrackerSettings SetDefaultEvictionAbsoluteExpiration(TimeSpan? defaultAbsoluteExpiration)
     {
         _defaultAbsoluteExpiration = defaultAbsoluteExpiration;
         return this;
@@ -160,7 +160,7 @@ public class SessionSettings
     /// </summary>
     /// <param name="defaultSlidingExpiration">The default value.</param>
     /// <returns>The settings.</returns>
-    public SessionSettings SetDefaultEvictionSlidingExpiration(TimeSpan? defaultSlidingExpiration)
+    public SessionTrackerSettings SetDefaultEvictionSlidingExpiration(TimeSpan? defaultSlidingExpiration)
     {
         _defaultSlidingExpiration = defaultSlidingExpiration;
         return this;
@@ -178,7 +178,7 @@ public class SessionSettings
     /// </param>
     /// <typeparam name="TSession">The cached type.</typeparam>
     /// <returns>The settings.</returns>
-    public SessionSettings SetAbsoluteExpiration<TSession>(TimeSpan? absoluteExpiration) where TSession : Session
+    public SessionTrackerSettings SetAbsoluteExpiration<TSession>(TimeSpan? absoluteExpiration) where TSession : Session
     {
         _absoluteCacheExpirations[typeof(TSession)] = absoluteExpiration;
         _absoluteEvictionCacheExpirations.TryAdd(typeof(TSession), absoluteExpiration);
@@ -194,7 +194,7 @@ public class SessionSettings
     /// </param>
     /// <typeparam name="TSession">The cached type.</typeparam>
     /// <returns>The settings.</returns>
-    public SessionSettings SetLockExpiration<TSession>(TimeSpan lockExpiration) where TSession : Session
+    public SessionTrackerSettings SetLockExpiration<TSession>(TimeSpan lockExpiration) where TSession : Session
     {
         _lockExpirations[typeof(TSession)] = lockExpiration;
         return this;
@@ -212,7 +212,7 @@ public class SessionSettings
     /// </param>
     /// <typeparam name="TSession">The cached type.</typeparam>
     /// <returns>The settings.</returns>
-    public SessionSettings SetSlidingExpiration<TSession>(TimeSpan? slidingExpiration) where TSession : Session
+    public SessionTrackerSettings SetSlidingExpiration<TSession>(TimeSpan? slidingExpiration) where TSession : Session
     {
         _slidingCacheExpirations[typeof(TSession)] = slidingExpiration;
         _slidingEvictionCacheExpirations.TryAdd(typeof(TSession), slidingExpiration);
@@ -227,7 +227,7 @@ public class SessionSettings
     /// </param>
     /// <typeparam name="TSession">The cached type.</typeparam>
     /// <returns>The settings.</returns>
-    public SessionSettings SetEvictionAbsoluteExpiration<TSession>(TimeSpan? absoluteExpiration) where TSession : Session
+    public SessionTrackerSettings SetEvictionAbsoluteExpiration<TSession>(TimeSpan? absoluteExpiration) where TSession : Session
     {
         _absoluteEvictionCacheExpirations[typeof(TSession)] = absoluteExpiration;
         return this;
@@ -241,7 +241,7 @@ public class SessionSettings
     /// </param>
     /// <typeparam name="TSession">The cached type.</typeparam>
     /// <returns>The settings.</returns>
-    public SessionSettings SetEvictionSlidingExpiration<TSession>(TimeSpan? slidingExpiration) where TSession : Session
+    public SessionTrackerSettings SetEvictionSlidingExpiration<TSession>(TimeSpan? slidingExpiration) where TSession : Session
     {
         _slidingEvictionCacheExpirations[typeof(TSession)] = slidingExpiration;
         return this;

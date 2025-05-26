@@ -1,36 +1,12 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using JetBrains.Annotations;
-using Microsoft.Extensions.Options;
 using Moq;
 using Remora.Results;
 using SessionTracker.Abstractions;
 using Xunit;
 
 namespace SessionTracker.Unit.Tests;
-
-[UsedImplicitly]
-public class SessionTrackerTestsFixture
-{
-    public readonly Mock<ISessionTrackerDataProvider> DataProviderMock = new();
-    public readonly Mock<IOptions<SessionSettings>> SettingsMock = new();
-    public Session Session => new(TestSessionKey);
-    public string TestSessionKey => "test";
-    public CancellationTokenSource Cts => new ();
-
-    public SessionTrackerTestsFixture()
-    {
-        var opt = new SessionSettings();
-        SettingsMock.Setup(x => x.Value).Returns(opt);
-        Service = new(DataProviderMock.Object, SettingsMock.Object);
-    }
-
-    public SessionTracker Service { get; }
-
-    public void Reset()
-        => DataProviderMock.Reset();
-}
 
 [Trait("session-tracker", "base")]
 public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
@@ -43,19 +19,19 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
 
     [Fact]
-    public async Task StartAsync_Should_Throw_When_CT_Cancelled()
+    public async Task StartAsyncShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.StartAsync(_fixture.Session, cts.Token));
     }
     
     [Fact]
-    public async Task StartAsync_Should_Pass_Session_And_CT()
+    public async Task StartAsyncShouldPassSessionAndCT()
     {
         // Arrange
         _fixture.Reset();
@@ -75,7 +51,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task StartAsync_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task StartAsyncShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -94,7 +70,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
 
     [Fact]
-    public async Task StartAsync_Should_Pass_Proper_EntryOptions()
+    public async Task StartAsyncShouldPassProperEntryOptions()
     {
         // Arrange
         _fixture.Reset();
@@ -122,7 +98,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task StartAsync_Should_Return_Success()
+    public async Task StartAsyncShouldReturnSuccess()
     {
         // Arrange
         _fixture.Reset();
@@ -143,7 +119,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task StartAsync_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task StartAsyncShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -170,19 +146,19 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetAsync_Should_Throw_When_CT_Cancelled()
+    public async Task GetAsyncShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.GetAsync<Session>(_fixture.TestSessionKey, cts.Token));
     }
     
     [Fact]
-    public async Task GetAsync_Should_Return_Success_With_Obtained_Session()
+    public async Task GetAsyncShouldReturnSuccessWithObtainedSession()
     {
         // Arrange
         _fixture.Reset();
@@ -204,7 +180,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetAsync_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task GetAsyncShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -227,7 +203,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetAsync_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task GetAsyncShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -246,19 +222,19 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetEvictedAsync_Should_Throw_When_CT_Cancelled()
+    public async Task GetEvictedAsyncShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.GetFinishedAsync<Session>(_fixture.TestSessionKey, cts.Token));
     }
     
     [Fact]
-    public async Task GetEvictedAsync_Should_Return_Success_With_Obtained_Session()
+    public async Task GetEvictedAsyncShouldReturnSuccessWithObtainedSession()
     {
         // Arrange
         _fixture.Reset();
@@ -280,7 +256,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetEvictedAsync_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task GetEvictedAsyncShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -303,7 +279,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetEvictedAsync_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task GetEvictedAsyncShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -322,7 +298,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
 
     [Fact]
-    public async Task RefreshAsync_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task RefreshAsyncShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -341,7 +317,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task RefreshAsync_Should_Return_Success()
+    public async Task RefreshAsyncShouldReturnSuccess()
     {
         // Arrange
         _fixture.Reset();
@@ -360,7 +336,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task RefreshAsync_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task RefreshAsyncShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -385,12 +361,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task UpdateAsync_Should_Throw_When_CT_Cancelled()
+    public async Task UpdateAsyncShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.UpdateAsync(_fixture.Session, cts.Token));
@@ -398,7 +374,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task UpdateAsync_Should_Return_Success()
+    public async Task UpdateAsyncShouldReturnSuccess()
     {
         // Arrange
         _fixture.Reset();
@@ -419,7 +395,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task UpdateAsync_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task UpdateAsyncShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -443,7 +419,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task UpdateAsync_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task UpdateAsyncShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -462,12 +438,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task UpdateAndGetAsync_Should_Throw_When_CT_Cancelled()
+    public async Task UpdateAndGetAsyncShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.UpdateAndGetAsync(_fixture.Session, cts.Token));
@@ -475,7 +451,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task UpdateAndGetAsync_Should_Return_Success_With_Obtained_Session()
+    public async Task UpdateAndGetAsyncShouldReturnSuccessWithObtainedSession()
     {
         // Arrange
         _fixture.Reset();
@@ -498,7 +474,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task UpdateAndGetAsync_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task UpdateAndGetAsyncShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -522,7 +498,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task UpdateAndGetAsync_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task UpdateAndGetAsyncShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -541,12 +517,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task FinishAsync_Should_Throw_When_CT_Cancelled()
+    public async Task FinishAsyncShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.FinishAsync<Session>(_fixture.TestSessionKey, cts.Token));
@@ -554,7 +530,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task FinishAsync_Should_Return_Success()
+    public async Task FinishAsyncShouldReturnSuccess()
     {
         // Arrange
         _fixture.Reset();
@@ -574,7 +550,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task FinishAsync_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task FinishAsyncShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -598,7 +574,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task FinishAsync_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task FinishAsyncShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -617,12 +593,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task FinishAndGetAsync_Should_Throw_When_CT_Cancelled()
+    public async Task FinishAndGetAsyncShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.FinishAndGetAsync<Session>(_fixture.TestSessionKey, cts.Token));
@@ -630,7 +606,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task FinishAndGetAsync_Should_Return_Success_With_Obtained_Session()
+    public async Task FinishAndGetAsyncShouldReturnSuccessWithObtainedSession()
     {
         // Arrange
         _fixture.Reset();
@@ -654,7 +630,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task FinishAndGetAsync_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task FinishAndGetAsyncShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -678,7 +654,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task FinishAndGetAsync_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task FinishAndGetAsyncShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -697,12 +673,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task ResumeAsync_Should_Throw_When_CT_Cancelled()
+    public async Task ResumeAsyncShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.ResumeAsync<Session>(_fixture.TestSessionKey, cts.Token));
@@ -710,7 +686,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task ResumeAsync_Should_Return_Success()
+    public async Task ResumeAsyncShouldReturnSuccess()
     {
         // Arrange
         _fixture.Reset();
@@ -736,7 +712,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task ResumeAsync_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task ResumeAsyncShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -766,7 +742,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task ResumeAsync_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task ResumeAsyncShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -785,12 +761,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task ResumeAndGetAsync_Should_Throw_When_CT_Cancelled()
+    public async Task ResumeAndGetAsyncShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.ResumeAndGetAsync<Session>(_fixture.TestSessionKey, cts.Token));
@@ -798,7 +774,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task ResumeAndGetAsync_Should_Return_Success_With_Obtained_Session()
+    public async Task ResumeAndGetAsyncShouldReturnSuccessWithObtainedSession()
     {
         // Arrange
         _fixture.Reset();
@@ -829,7 +805,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task ResumeAndGetAsync_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task ResumeAndGetAsyncShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -859,7 +835,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task ResumeAndGetAsync_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task ResumeAndGetAsyncShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -878,19 +854,19 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task LockAsync_OnlyExp_Should_Throw_When_CT_Cancelled()
+    public async Task LockAsyncOnlyExpShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.LockAsync<Session>(_fixture.TestSessionKey, new TimeSpan(), cts.Token));
     }
     
     [Fact]
-    public async Task LockAsync_OnlyExp_Should_Return_Success_With_Obtained_Lock_When_Exp_Passed()
+    public async Task LockAsyncOnlyExpShouldReturnSuccessWithObtainedLockWhenExpPassed()
     {
         // Arrange
         _fixture.Reset();
@@ -913,7 +889,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task LockAsync_OnlyExp_Should_Return_Success_With_Obtained_Lock_When_Exp_Null()
+    public async Task LockAsyncOnlyExpShouldReturnSuccessWithObtainedLockWhenExpNull()
     {
         // Arrange
         _fixture.Reset();
@@ -938,7 +914,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
 
     [Fact]
-    public async Task LockAsync_OnlyExp_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task LockAsyncOnlyExpShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -964,7 +940,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task LockAsync_OnlyExp_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task LockAsyncOnlyExpShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -983,12 +959,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task LockAsync_All_Should_Throw_When_CT_Cancelled()
+    public async Task LockAsyncAllShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.LockAsync<Session>(_fixture.TestSessionKey, new TimeSpan(), new TimeSpan(), new TimeSpan(), cts.Token));
@@ -996,7 +972,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task LockAsync_All_Should_Return_Success_With_Obtained_Lock()
+    public async Task LockAsyncAllShouldReturnSuccessWithObtainedLock()
     {
         // Arrange
         _fixture.Reset();
@@ -1023,7 +999,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
 
     [Fact]
-    public async Task LockAsync_All_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task LockAsyncAllShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -1052,7 +1028,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task LockAsync_All_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task LockAsyncAllShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -1071,12 +1047,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
         [Fact]
-    public async Task LockAsync_WaitRetry_Should_Throw_When_CT_Cancelled()
+    public async Task LockAsyncWaitRetryShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.LockAsync<Session>(_fixture.TestSessionKey, new TimeSpan(), new TimeSpan(), cts.Token));
@@ -1084,7 +1060,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task LockAsync_WaitRetry_Should_Return_Success_With_Obtained_Lock()
+    public async Task LockAsyncWaitRetryShouldReturnSuccessWithObtainedLock()
     {
         // Arrange
         _fixture.Reset();
@@ -1112,7 +1088,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
 
     [Fact]
-    public async Task LockAsync_WaitRetry_Should_Return_Error_When_DataProvider_Returns_Error()
+    public async Task LockAsyncWaitRetryShouldReturnErrorWhenDataProviderReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -1142,7 +1118,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task LockAsync_WaitRetry_Should_Return_ExceptionError_When_Ex_Is_Caught()
+    public async Task LockAsyncWaitRetryShouldReturnExceptionErrorWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -1161,12 +1137,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetLockedAsync_OnlyExp_Should_Throw_When_CT_Cancelled()
+    public async Task GetLockedAsyncOnlyExpShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
         
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () => await _fixture.Service.GetLockedAsync<Session>(_fixture.TestSessionKey, new TimeSpan(), cts.Token));
@@ -1174,7 +1150,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task GetLockedAsync_OnlyExp_Should_Return_Success_With_Obtained_Lock_When_Exp_Passed()
+    public async Task GetLockedAsyncOnlyExpShouldReturnSuccessWithObtainedLockWhenExpPassed()
     {
         // Arrange
         _fixture.Reset();
@@ -1202,7 +1178,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetLockedAsync_OnlyExp_Should_Return_Success_With_Obtained_Lock_When_Exp_Null()
+    public async Task GetLockedAsyncOnlyExpShouldReturnSuccessWithObtainedLockWhenExpNull()
     {
         // Arrange
         _fixture.Reset();
@@ -1233,7 +1209,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task LockAsync_OnlyExp_Should_Return_Error_When_DataProvider_LockAsync_Returns_Error()
+    public async Task LockAsyncOnlyExpShouldReturnErrorWhenDataProviderLockAsyncReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -1264,7 +1240,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task LockAsync_OnlyExp_Should_Return_Error_When_DataProvider_GetAsync_Returns_Error()
+    public async Task LockAsyncOnlyExpShouldReturnErrorWhenDataProviderGetAsyncReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -1295,7 +1271,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetLockedAsync_OnlyExp_Should_Return_ExceptionError_And_Release_Lock_When_Ex_Is_Caught()
+    public async Task GetLockedAsyncOnlyExpShouldReturnExceptionErrorAndReleaseLockWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -1321,12 +1297,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetLockedAsync_All_Should_Throw_When_CT_Cancelled()
+    public async Task GetLockedAsyncAllShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
 
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () =>
@@ -1335,7 +1311,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task GetLockedAsync_All_Should_Return_Success_With_Obtained_Lock()
+    public async Task GetLockedAsyncAllShouldReturnSuccessWithObtainedLock()
     {
         // Arrange
         _fixture.Reset();
@@ -1368,7 +1344,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task LockAsync_All_Should_Return_Error_When_DataProvider_LockAsync_Returns_Error()
+    public async Task LockAsyncAllShouldReturnErrorWhenDataProviderLockAsyncReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -1401,7 +1377,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task LockAsync_All_Should_Return_Error_When_DataProvider_GetAsync_Returns_Error()
+    public async Task LockAsyncAllShouldReturnErrorWhenDataProviderGetAsyncReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -1434,7 +1410,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
 
     [Fact]
-    public async Task GetLockedAsync_All_Should_Return_ExceptionError_And_Release_Lock_When_Ex_Is_Caught()
+    public async Task GetLockedAsyncAllShouldReturnExceptionErrorAndReleaseLockWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
@@ -1462,12 +1438,12 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
 
     [Fact]
-    public async Task GetLockedAsync_WaitRetry_Should_Throw_When_CT_Cancelled()
+    public async Task GetLockedAsyncWaitRetryShouldThrowWhenCTCancelled()
     {
         // Arrange
         _fixture.Reset();
         var cts = _fixture.Cts;
-        cts.Cancel();
+        await cts.CancelAsync();
 
         // Act && Assert
         await Assert.ThrowsAsync<OperationCanceledException>(async () =>
@@ -1477,7 +1453,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     
     
     [Fact]
-    public async Task GetLockedAsync_WaitRetry_Should_Return_Success_With_Obtained_Lock()
+    public async Task GetLockedAsyncWaitRetryShouldReturnSuccessWithObtainedLock()
     {
         // Arrange
         _fixture.Reset();
@@ -1508,7 +1484,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task LockAsync_WaitRetry_Should_Return_Error_When_DataProvider_LockAsync_Returns_Error()
+    public async Task LockAsyncWaitRetryShouldReturnErrorWhenDataProviderLockAsyncReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -1542,7 +1518,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
     
     [Fact]
-    public async Task LockAsync_WaitRetry_Should_Return_Error_When_DataProvider_GetAsync_Returns_Error()
+    public async Task LockAsyncWaitRetryShouldReturnErrorWhenDataProviderGetAsyncReturnsError()
     {
         // Arrange
         _fixture.Reset();
@@ -1573,7 +1549,7 @@ public class SessionTrackerTests : IClassFixture<SessionTrackerTestsFixture>
     }
 
     [Fact]
-    public async Task GetLockedAsync_WaitRetry_Should_Return_ExceptionError_And_Release_Lock_When_Ex_Is_Caught()
+    public async Task GetLockedAsyncWaitRetryShouldReturnExceptionErrorAndReleaseLockWhenExIsCaught()
     {
         // Arrange
         _fixture.Reset();
