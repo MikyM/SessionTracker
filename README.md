@@ -30,14 +30,14 @@ builder.AddSessionTracker(options);
 
 For Redis implementation:
 ```csharp
-builder.AddRedisSessionTracker(redisOptions, options);
+builder.AddSessionTracker(options => options.UseRedis(redisOptions));
 ```
 If you wish to configure the `JsonSerializerOptions` used for serializing/deserializing session instances within Redis provider use:
 ```csharp
 services.Configure<JsonSerializerOptions>(RedisSessionSettings.JsonSerializerName, yourOptions);
 ```
 
-You can implement your own backing store provider and lock provider by implementing `ISessionTrackerDataProvider` or `ISessionLockProvder` interfaces respectively and registering your new services with the container like so:
+You can implement your own backing store provider and lock provider by implementing `ISessionTrackerDataProvider` or `ISessionLockProvder` interfaces respectively and registering your new services with the container manually or with helper methods like so:
 ```csharp
 services.AddSessionTrackerDataProvider<YourDataProviderType>();
 services.AddSessionTrackerLockProvider<YourLockProviderType>();
