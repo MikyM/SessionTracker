@@ -46,54 +46,43 @@ jobs:
         cd src
         dotnet test -c Release --no-restore --no-build --verbosity minimal
   
-    - name: Pack DataExplorer
+    - name: Pack SessionTracker
       if: github.event_name == 'push'
       run: |  
-        cd src/DataExplorer
+        cd src/SessionTracker
         dotnet pack -c Release -o out 
 
-    - name: Push DataExplorer NuGet registry
+    - name: Push SessionTracker NuGet registry
       if: github.event_name == 'push'
-      run: dotnet nuget push ./src/DataExplorer/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/SessionTracker/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
 
-    - name: Pack DataExplorer.EfCore
+    - name: Pack SessionTracker.InMemory
       if: github.event_name == 'push'
       run: | 
-        cd src/DataExplorer.EfCore
+        cd src/SessionTracker.InMemory
         dotnet pack -c Release -o out 
 
-    - name: Push DataExplorer.EfCore NuGet registry
+    - name: Push SessionTracker.InMemory NuGet registry
       if: github.event_name == 'push'
-      run: dotnet nuget push ./src/DataExplorer.EfCore/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/SessionTracker.InMemory/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
 
-    - name: Pack DataExplorer.Extensions.Autofac
+    - name: Pack SessionTracker.Redis
       if: github.event_name == 'push'
       run: | 
-        cd src/DataExplorer.Extensions.Autofac
+        cd src/SessionTracker.Redis
         dotnet pack -c Release -o out 
 
-    - name: Push DataExplorer.Autofac NuGet registry
+    - name: Push SessionTracker.Redis NuGet registry
       if: github.event_name == 'push'
-      run: dotnet nuget push ./src/DataExplorer.Extensions.Autofac/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
-
-    - name: Pack DataExplorer.Extensions.AutoMapper
-      if: github.event_name == 'push'
-      run: | 
-        cd src/DataExplorer.Extensions.AutoMapper
-        dotnet pack -c Release -o out 
-
-    - name: Push DataExplorer.Extensions.AutoMapper NuGet registry
-      if: github.event_name == 'push'
-      run: dotnet nuget push ./src/DataExplorer.Extensions.AutoMapper/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+      run: dotnet nuget push ./src/SessionTracker.Redis/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
 
     - name: Prepare package upload as artifacts
       if: github.event_name == 'push'
       run: | 
         mkdir nuget-packages
-        cp src/DataExplorer/out/* nuget-packages
-        cp src/DataExplorer.EfCore/out/* nuget-packages
-        cp src/DataExplorer.Extensions.AutoMapper/out/* nuget-packages
-        cp src/DataExplorer.Extensions.Autofac/out/* nuget-packages
+        cp src/SessionTracker/out/* nuget-packages
+        cp src/SessionTracker.InMemory/out/* nuget-packages
+        cp src/SessionTracker.Redis/out/* nuget-packages
 
     - name: Upload packages as artifacts
       if: github.event_name == 'push'
