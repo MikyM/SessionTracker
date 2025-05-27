@@ -31,15 +31,18 @@ public interface ISessionLock : IAsyncDisposable, IDisposable, IEquatable<ISessi
     /// <summary>
     /// The resource on which the lock was acquired.
     /// </summary>
-    string SessionKey { get; }
+    string Resource { get; }
+    
     /// <summary>
     /// Locks ID.
     /// </summary>
-    string LockId { get; }
+    string Id { get; }
+    
     /// <summary>
     /// Whether the lock was successfully acquired.
     /// </summary>
     bool IsAcquired { get; }
+    
     /// <summary>
     /// The lock's status.
     /// </summary>
@@ -51,7 +54,7 @@ public interface ISessionLock : IAsyncDisposable, IDisposable, IEquatable<ISessi
     /// <param name="other">Other.</param>
     /// <returns>Whether two locks are equal.</returns>
     bool IEquatable<ISessionLock>.Equals(ISessionLock? other) =>
-        other is not null && IsAcquired == other.IsAcquired && SessionKey == other.SessionKey &&
-        LockId == other.LockId &&
+        other is not null && IsAcquired == other.IsAcquired && Resource == other.Resource &&
+        Id == other.Id &&
         Status == other.Status;
 }

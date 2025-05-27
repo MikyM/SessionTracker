@@ -14,9 +14,15 @@ public class SessionTrackerBuilder
     /// </summary>
     public IServiceCollection Services { get; }
     
-    internal SessionTrackerBuilder(IServiceCollection services)
+    /// <summary>
+    /// Services.
+    /// </summary>
+    public SessionTrackerSettings Settings { get; }
+    
+    internal SessionTrackerBuilder(IServiceCollection services, SessionTrackerSettings settings)
     {
         Services = services;
+        Settings = settings;
     }
 
     /// <summary>
@@ -34,7 +40,7 @@ public class SessionTrackerBuilder
     /// </summary>
     /// <param name="lifetime">The lifetime.</param>
     /// <returns>The services.</returns>
-    public SessionTrackerBuilder AddDataProvider<TDataProvider>(ServiceLifetime lifetime = ServiceLifetime.Singleton) where TDataProvider : class, ISessionTrackerDataProvider
+    public SessionTrackerBuilder AddDataProvider<TDataProvider>(ServiceLifetime lifetime = ServiceLifetime.Singleton) where TDataProvider : class, ISessionDataProvider
     {
         Services.Add(ServiceDescriptor.Describe(typeof(ISessionLockProvider), typeof(TDataProvider), lifetime));
 
@@ -57,9 +63,34 @@ public class SessionTrackerBuilder
     /// </summary>
     /// <param name="instance">An instance of the provider.</param>
     /// <returns>The services.</returns>
-    public SessionTrackerBuilder AddDataProvider<TDataProvider>(TDataProvider instance) where TDataProvider : class, ISessionTrackerDataProvider
+    public SessionTrackerBuilder AddDataProvider<TDataProvider>(TDataProvider instance) where TDataProvider : class, ISessionDataProvider
     {
-        Services.AddSingleton<ISessionTrackerDataProvider>(instance);
+        Services.AddSingleton<ISessionDataProvider>(instance);
+
+        return this;
+    }
+    
+    /// <summary>
+    /// Adds a custom session tracking data provider.
+    /// </summary>
+    /// <param name="factory">An instance of the provider.</param>
+    /// <param name="lifetime">Lifetime.</param>
+    /// <returns>The services.</returns>
+    public SessionTrackerBuilder AddDataProvider<TDataProvider>(Func<IServiceProvider,TDataProvider> factory, ServiceLifetime lifetime = ServiceLifetime.Singleton) where TDataProvider : class, ISessionDataProvider
+    {
+        Services.Add(ServiceDescriptor.Describe(typeof(ISessionDataProvider), factory, lifetime));
+        return this;
+    }
+
+    /// <summary>
+    /// Adds a custom session tracking lock provider.
+    /// </summary>
+    /// <param name="factory">An instance of the provider.</param>
+    /// <param name="lifetime">Lifetime.</param>
+    /// <returns>The services.</returns>
+    public SessionTrackerBuilder AddLockProvider<TLockProvider>(Func<IServiceProvider,TLockProvider> factory, ServiceLifetime lifetime = ServiceLifetime.Singleton) where TLockProvider : class, ISessionLockProvider
+    {
+        Services.Add(ServiceDescriptor.Describe(typeof(ISessionLockProvider), factory, lifetime));
 
         return this;
     }

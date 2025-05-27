@@ -35,7 +35,7 @@ public class Session : ISession, IEquatable<ISession>
     /// <summary>
     /// Base session constructor.
     /// </summary>
-    /// <param name="key">Sessions key.</param>
+    /// <param name="key">Clients Sessions key.</param>
     public Session(string key)
     {
         Key = key;
@@ -54,10 +54,22 @@ public class Session : ISession, IEquatable<ISession>
     public DateTimeOffset StartedAt { get; internal set; } = DateTimeProvider.Instance.OffsetUtcNow;
 
     /// <summary>
-    /// The key associated with this session.
+    /// The clients key associated with this session.
     /// </summary>
     [JsonInclude]
     public string Key { get; internal set; }
+    
+    /// <summary>
+    /// The underlying provider key associated with this session.
+    /// </summary>
+    [JsonInclude]
+    public string? ProviderKey { get; internal set; }
+    
+    /// <summary>
+    /// The underlying provider cache key associated with this session.
+    /// </summary>
+    [JsonInclude]
+    public string? EvictedProviderKey { get; internal set; }
 
     /// <summary>
     /// Serializes this instance to JSON.

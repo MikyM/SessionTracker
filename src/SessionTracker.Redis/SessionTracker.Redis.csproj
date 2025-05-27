@@ -7,7 +7,7 @@
         <PackageId>SessionTracker.Redis</PackageId>
         <Version>1.0.14</Version>
         <Authors>Krzysztof Kupisz</Authors>
-        <PackageDescription>Sub library that adds Redis backing-store implementation for the SessionTracker.</PackageDescription>
+        <PackageDescription>Sub library that adds RESP backing-store implementation for the SessionTracker.</PackageDescription>
         <RepositoryUrl>https://github.com/MikyM/SessionTracker</RepositoryUrl>
         <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -18,7 +18,7 @@
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>SessionTracker.Redis.Unit.Tests</_Parameter1>
+            <_Parameter1>SessionTracker.Redis.Tests.Unit</_Parameter1>
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>

@@ -29,9 +29,19 @@ namespace SessionTracker.Abstractions;
 public interface ISession
 {
     /// <summary>
-    /// Session's key.
+    /// Session's Id.
     /// </summary>
     string Key { get; }
+    
+    /// <summary>
+    /// The underlying provider key associated with this session.
+    /// </summary>
+    string? ProviderKey { get; }
+    
+    /// <summary>
+    /// The underlying evicted provider key associated with this session.
+    /// </summary>
+    string? EvictedProviderKey { get; }
 
     /// <summary>
     /// Gets the time at which this session started.

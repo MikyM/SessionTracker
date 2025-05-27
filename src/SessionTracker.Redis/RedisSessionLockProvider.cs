@@ -1,4 +1,5 @@
 ﻿using JetBrains.Annotations;
+using RedLockNet;
 using RedLockNet.SERedis;
 using Remora.Results;
 using SessionTracker.Abstractions;
@@ -11,39 +12,66 @@ namespace SessionTracker.Redis;
 [PublicAPI]
 public sealed class RedisSessionLockProvider : ISessionLockProvider
 {
-    private readonly RedLockFactory _lockFactory;
+    private readonly IDistributedLockFactory _lockFactory;
+    private readonly RedisSessionTrackerKeyCreator _keyCreator;
 
     /// <summary>
     /// Creates a new instance of <see cref="RedisSessionLockProvider"/>.
     /// </summary>
     /// <param name="lockFactory">Inner factory.</param>
-    public RedisSessionLockProvider(RedLockFactory lockFactory)
+    /// <param name="keyCreator">Key creator.</param>
+    public RedisSessionLockProvider(IDistributedLockFactory lockFactory, RedisSessionTrackerKeyCreator keyCreator)
     {
         _lockFactory = lockFactory;
+        _keyCreator = keyCreator;
     }
 
 
     /// <inheritdoc />
-    public async Task<Result<ISessionLock>> AcquireAsync(string key, TimeSpan lockExpirationTime, TimeSpan lockWaitTime,
+    public async Task<Result<ISessionLock>> AcquireAsync<TSession>(string resource, TimeSpan lockExpirationTime,
+        TimeSpan lockWaitTime,
         TimeSpan lockRetryTime,
-        CancellationToken ct = default)
+        CancellationToken ct = default) where TSession : Session
     {
-        var lockRes = await _lockFactory.CreateLockAsync(key, lockExpirationTime, lockWaitTime, lockRetryTime, ct).ConfigureAwait(false);
-        if (!lockRes.IsAcquired)
-            return new SessionLockNotAcquiredError(RedisSessionLock.TranslateRedLockStatus(lockRes.Status));
+        ct.ThrowIfCancellationRequested();
+        
+        try
+        {
+            var lockKey = _keyCreator.CreateLockKey<TSession>(resource);
 
-        return new RedisSessionLock(lockRes);
+            var lockRes =
+                await _lockFactory.CreateLockAsync(lockKey, lockExpirationTime, lockWaitTime, lockRetryTime, ct);
+            if (!lockRes.IsAcquired)
+                return new SessionLockNotAcquiredError(RedisSessionLock.TranslateRedLockStatus(lockRes.Status));
+
+            return new RedisSessionLock(lockRes);
+        }
+        catch (Exception ex)
+        {
+            return ex;
+        }
     }
 
     /// <inheritdoc />
-    public async Task<Result<ISessionLock>> AcquireAsync(string key, TimeSpan lockExpirationTime,
-        CancellationToken ct = default)
+    public async Task<Result<ISessionLock>> AcquireAsync<TSession>(string resource, TimeSpan lockExpirationTime,
+        CancellationToken ct = default) where TSession : Session
     {
-        var lockRes = await _lockFactory.CreateLockAsync(key, lockExpirationTime).ConfigureAwait(false);
-        ;
-        if (!lockRes.IsAcquired)
-            return new SessionLockNotAcquiredError(RedisSessionLock.TranslateRedLockStatus(lockRes.Status));
+        ct.ThrowIfCancellationRequested();
+        
+        try
+        {
+            var lockKey = _keyCreator.CreateLockKey<TSession>(resource);
 
-        return new RedisSessionLock(lockRes);
+            var lockRes = await _lockFactory.CreateLockAsync(lockKey, lockExpirationTime);
+
+            if (!lockRes.IsAcquired)
+                return new SessionLockNotAcquiredError(RedisSessionLock.TranslateRedLockStatus(lockRes.Status));
+
+            return new RedisSessionLock(lockRes);
+        }
+        catch (Exception ex)
+        {
+            return ex;
+        }
     }
 }

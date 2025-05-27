@@ -2,13 +2,21 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker", "SessionTracker\SessionTracker.csproj", "{25A04C9E-4A3A-48DB-8909-16960C910A7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Redis", "SessionTracker.Redis\SessionTracker.Redis.csproj", "{8FCF80BC-BC03-433D-870B-672A9DE46BC5}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{A2F95228-C5C6-4417-AC18-0F32FE0D499F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Unit.Tests", "..\tests\SessionTracker.Unit.Tests\SessionTracker.Unit.Tests.csproj", "{BCD7A270-89D0-468B-AC3C-F7FC0EC74417}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Tests.Unit", "..\tests\SessionTracker.Tests.Unit\SessionTracker.Tests.Unit.csproj", "{BCD7A270-89D0-468B-AC3C-F7FC0EC74417}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Redis.Unit.Tests", "..\tests\SessionTracker.Redis.Unit.Tests\SessionTracker.Redis.Unit.Tests.csproj", "{212D657B-F5D8-4DE5-B641-25EFE2F1C636}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Redis.Tests.Unit", "..\tests\SessionTracker.Redis.Tests.Unit\SessionTracker.Redis.Tests.Unit.csproj", "{212D657B-F5D8-4DE5-B641-25EFE2F1C636}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit", "Unit", "{C965A133-C660-499A-868C-8B32A85B03A7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{E54330BA-D807-43D2-8EC3-CEAB0063578E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Redis.Tests.Integration", "..\tests\SessionTracker.Redis.Tests.Integration\SessionTracker.Redis.Tests.Integration.csproj", "{B581BF0D-1DCB-4DBF-A8BA-D2EA203F5DF1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.InMemory", "SessionTracker.InMemory\SessionTracker.InMemory.csproj", "{C87BFAEA-A5F3-4B79-9CEA-5F435F2C1740}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Redis", "SessionTracker.Redis\SessionTracker.Redis.csproj", "{24E2961A-8B09-4436-B8AF-3CF175B26DE0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,10 +28,6 @@ Global
 		{25A04C9E-4A3A-48DB-8909-16960C910A7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{25A04C9E-4A3A-48DB-8909-16960C910A7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{25A04C9E-4A3A-48DB-8909-16960C910A7F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8FCF80BC-BC03-433D-870B-672A9DE46BC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8FCF80BC-BC03-433D-870B-672A9DE46BC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8FCF80BC-BC03-433D-870B-672A9DE46BC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8FCF80BC-BC03-433D-870B-672A9DE46BC5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BCD7A270-89D0-468B-AC3C-F7FC0EC74417}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{BCD7A270-89D0-468B-AC3C-F7FC0EC74417}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCD7A270-89D0-468B-AC3C-F7FC0EC74417}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -32,9 +36,24 @@ Global
 		{212D657B-F5D8-4DE5-B641-25EFE2F1C636}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{212D657B-F5D8-4DE5-B641-25EFE2F1C636}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{212D657B-F5D8-4DE5-B641-25EFE2F1C636}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B581BF0D-1DCB-4DBF-A8BA-D2EA203F5DF1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B581BF0D-1DCB-4DBF-A8BA-D2EA203F5DF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B581BF0D-1DCB-4DBF-A8BA-D2EA203F5DF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B581BF0D-1DCB-4DBF-A8BA-D2EA203F5DF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C87BFAEA-A5F3-4B79-9CEA-5F435F2C1740}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C87BFAEA-A5F3-4B79-9CEA-5F435F2C1740}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C87BFAEA-A5F3-4B79-9CEA-5F435F2C1740}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C87BFAEA-A5F3-4B79-9CEA-5F435F2C1740}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24E2961A-8B09-4436-B8AF-3CF175B26DE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24E2961A-8B09-4436-B8AF-3CF175B26DE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24E2961A-8B09-4436-B8AF-3CF175B26DE0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24E2961A-8B09-4436-B8AF-3CF175B26DE0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{BCD7A270-89D0-468B-AC3C-F7FC0EC74417} = {A2F95228-C5C6-4417-AC18-0F32FE0D499F}
-		{212D657B-F5D8-4DE5-B641-25EFE2F1C636} = {A2F95228-C5C6-4417-AC18-0F32FE0D499F}
+		{C965A133-C660-499A-868C-8B32A85B03A7} = {A2F95228-C5C6-4417-AC18-0F32FE0D499F}
+		{212D657B-F5D8-4DE5-B641-25EFE2F1C636} = {C965A133-C660-499A-868C-8B32A85B03A7}
+		{BCD7A270-89D0-468B-AC3C-F7FC0EC74417} = {C965A133-C660-499A-868C-8B32A85B03A7}
+		{E54330BA-D807-43D2-8EC3-CEAB0063578E} = {A2F95228-C5C6-4417-AC18-0F32FE0D499F}
+		{B581BF0D-1DCB-4DBF-A8BA-D2EA203F5DF1} = {E54330BA-D807-43D2-8EC3-CEAB0063578E}
 	EndGlobalSection
 EndGlobal

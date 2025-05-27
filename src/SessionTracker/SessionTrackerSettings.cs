@@ -28,10 +28,9 @@ namespace SessionTracker;
 [PublicAPI]
 public class SessionTrackerSettings
 {
-   
     /// <summary>
     /// Holds absolute cache expiration values for various types.
-    /// </summary>
+    /// </summary>  
     private readonly Dictionary<Type, TimeSpan?> _absoluteCacheExpirations = new();
     
     /// <summary>

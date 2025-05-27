@@ -48,7 +48,10 @@ public static class ServiceCollectionExtensions
         services.AddOptions().Configure(sessionConfiguration);
         
         services.AddSingleton<ISessionTracker,SessionTracker>();
+        
+        var config = new SessionTrackerSettings();
+        sessionConfiguration.Invoke(config);
 
-        return new SessionTrackerBuilder(services);
+        return new SessionTrackerBuilder(services, config);
     }
 }

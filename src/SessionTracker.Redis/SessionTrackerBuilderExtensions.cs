@@ -24,6 +24,8 @@ using System.Text.Json;
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
+using RedLockNet;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
 using SessionTracker.Abstractions;
@@ -42,9 +44,9 @@ public static class SessionTrackerBuilderExtensions
     /// Adds a redis based backing store implementation for sessions.
     /// </summary>
     /// <remarks>
-    /// It is very important to know that the stock implementation of <see cref="ISessionTrackerDataProvider"/> that this method
-    /// adds uses JSON to store values. If JSON is not a desirable format, the caching methods in <see cref="RedisDataProvider"/> can be provided, or a custom
-    /// implementation of <see cref="ISessionTrackerDataProvider"/> can be added to the container.
+    /// It is very important to know that the stock implementation of <see cref="ISessionDataProvider"/> that this method
+    /// adds uses JSON to store values. If JSON is not a desirable format, the caching methods in <see cref="RedisSessionDataProvider"/> can be provided, or a custom
+    /// implementation of <see cref="ISessionDataProvider"/> can be added to the container.
     /// </remarks>
     /// <param name="builder">The builder.</param>
     /// <param name="redisSessionConfiguration">Redis session tracker configuration.</param>
@@ -57,12 +59,16 @@ public static class SessionTrackerBuilderExtensions
         var redisOpt = new RedisSessionTrackerSettings();
         redisSessionConfiguration(redisOpt);
 
-        var multiplexer =
-            redisOpt.Multiplexer ?? redisOpt.MultiplexerFactory?.Invoke();
+        var multiplexer = redisOpt.Multiplexer ?? redisOpt.MultiplexerFactory?.Invoke();
 
         if (multiplexer is null && redisOpt.RedisConfigurationOptions is not null)
         {
             multiplexer = ConnectionMultiplexer.Connect(redisOpt.RedisConfigurationOptions);
+
+            if (redisOpt.ProfilingSession is not null)
+            {
+                multiplexer.RegisterProfiler(redisOpt.ProfilingSession);
+            }
         }
 
         if (multiplexer is null)
@@ -78,14 +84,25 @@ public static class SessionTrackerBuilderExtensions
         }
         
         builder.Services.Configure(redisSessionConfiguration);
+
+        if (redisOpt.SkipLockFactoryCreation)
+        {
+            var redLockMultiplexer = (RedLockMultiplexer)(ConnectionMultiplexer)multiplexer;
         
-        var factory = RedLockFactory.Create(new List<RedLockMultiplexer> { (ConnectionMultiplexer)multiplexer });
+            redLockMultiplexer.RedisKeyFormat = redisOpt.SessionKeyPrefix + ":" + redisOpt.SessionLockPrefix + ":{0}";
         
-        builder.AddLockProvider(new RedisSessionLockProvider(factory));
+            var factory = RedLockFactory.Create(new List<RedLockMultiplexer> { (ConnectionMultiplexer)multiplexer });
+
+            builder.Services.AddSingleton<IDistributedLockFactory>(factory);
+        }
+        
+        builder.AddLockProvider<RedisSessionLockProvider>();
         
         builder.Services.TryAddSingleton(multiplexer);
         
-        builder.AddDataProvider<RedisDataProvider>();
+        builder.AddDataProvider<RedisSessionDataProvider>();
+
+        builder.Services.AddSingleton<RedisSessionTrackerKeyCreator>();
 
         return new RedisSessionTrackerBuilder(builder);
     }
