@@ -8,10 +8,8 @@ namespace SessionTracker.InMemory;
 /// An in-memory session lock.
 /// </summary>
 [PublicAPI]
-public sealed class InMemorySessionLock : ISessionLock
+public sealed class InMemorySessionLock : ISessionLock, IEquatable<InMemorySessionLock>
 {
-    private readonly SemaphoreSlim _semaphoreSlim = new(1, 1);
-    
     private bool _disposed;
     
     private TimeSpan _expiryJitter = TimeSpan.FromMilliseconds(10);
@@ -130,4 +128,24 @@ public sealed class InMemorySessionLock : ISessionLock
     public bool IsAcquired { get; private set; }
     /// <inheritdoc/>
     public SessionLockStatus Status { get; private set; }
+
+    /// <inheritdoc/>
+    public bool Equals(InMemorySessionLock? other)
+    {
+        if (other is null) return false;
+        if (ReferenceEquals(this, other)) return true;
+        return Resource == other.Resource && Id == other.Id;
+    }
+
+    /// <inheritdoc/>
+    public override bool Equals(object? obj)
+    {
+        return ReferenceEquals(this, obj) || obj is InMemorySessionLock other && Equals(other);
+    }
+
+    /// <inheritdoc/>
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Resource, Id);
+    }
 }

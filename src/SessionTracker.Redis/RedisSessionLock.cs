@@ -89,8 +89,7 @@ public sealed class RedisSessionLock : ISessionLock, IEquatable<RedisSessionLock
         if (other is null)
             return false;
 
-        return IsAcquired == other.IsAcquired && Resource == other.Resource && Id == other.Id &&
-               Status == other.Status;
+        return Resource == other.Resource && Id == other.Id;
     }
 
     /// <summary>
@@ -109,7 +108,7 @@ public sealed class RedisSessionLock : ISessionLock, IEquatable<RedisSessionLock
     /// <inheritdoc />
     public override int GetHashCode()
     {
-        return HashCode.Combine(IsAcquired, Resource, Id, Status);
+        return HashCode.Combine(Resource, Id);
     }
 
     /// <summary>
