@@ -17,6 +17,8 @@ public static class Helpers
 
         var keyCreator = new InMemorySessionTrackerKeyCreator(opt);
 
+        services.AddLogging();
+
         services.AddSingleton(keyCreator);
 
         services.AddSingleton<MemoryCacheQueue>();
@@ -38,6 +40,8 @@ public static class Helpers
         var keyCreator = new InMemorySessionTrackerKeyCreator(opt);
 
         services.AddSingleton(keyCreator);
+        
+        services.AddLogging();
 
         services.AddSingleton<MemoryCacheQueue>();
 
