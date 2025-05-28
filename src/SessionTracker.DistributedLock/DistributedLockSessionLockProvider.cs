@@ -45,15 +45,25 @@ public class DistributedLockSessionLockProvider : ISessionLockProvider
         CancellationToken ct = default) where TSession : Session
     {
         var name = _nameCreator.CreateName<TSession>(resource);
+
+        var id = CreateLockId();
+        
+        _logger.LogDebug(
+            "Attempting to acquire lock for {Resource} with {Exp} expiration time, assigned ID {Id}:, assigned lock key: {Key}",
+            resource, lockExpirationTime, id, name);
         
         var @lock = _distributedLockProvider.CreateLock(name);
         
         var result = await @lock.TryAcquireAsync(lockWaitTime, ct);
         var expAt = _timeProvider.GetUtcNow().Add(lockExpirationTime);
+        
+        _logger.LogDebug(
+            "Acquiring lock for resource {Resource} with lock ID {Id} and lock key {Key} ended up with status: {Status}",
+            resource, id, name, result is not null ? SessionLockStatus.Acquired : SessionLockStatus.Conflicted);
 
         return result is null
             ? new SessionLockNotAcquiredError(SessionLockStatus.Conflicted)
-                : new DistributedLockSessionLock(result, expAt, resource, true, SessionLockStatus.Acquired, CreateLockId());
+                : new DistributedLockSessionLock(result, expAt, resource, true, SessionLockStatus.Acquired, id);
     }
 
     /// <inheritdoc/>
@@ -67,11 +77,21 @@ public class DistributedLockSessionLockProvider : ISessionLockProvider
         
         var @lock = _distributedLockProvider.CreateLock(name);
         
+        var id = CreateLockId();
+        
+        _logger.LogDebug(
+            "Attempting to acquire lock for {Resource} with {Exp} expiration time, assigned ID {Id}:, assigned lock key: {Key}",
+            resource, lockExpirationTime, id, name);
+        
         var result = await @lock.TryAcquireAsync(TimeSpan.Zero, ct);
         var expAt = _timeProvider.GetUtcNow().Add(lockExpirationTime);
 
+        _logger.LogDebug(
+            "Acquiring lock for resource {Resource} with lock ID {Id} and lock key {Key} ended up with status: {Status}",
+            resource, id, name, result is not null ? SessionLockStatus.Acquired : SessionLockStatus.Conflicted);
+
         return result is null
             ? new SessionLockNotAcquiredError(SessionLockStatus.Conflicted)
-            : new DistributedLockSessionLock(result, expAt, resource, true, SessionLockStatus.Acquired, CreateLockId());
+            : new DistributedLockSessionLock(result, expAt, resource, true, SessionLockStatus.Acquired, id);
     }
 }
