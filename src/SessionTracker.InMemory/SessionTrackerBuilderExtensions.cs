@@ -73,6 +73,8 @@ public static class SessionTrackerBuilderExtensions
         builder.Services.AddSingleton<InMemorySessionTrackerKeyCreator>();
 
         builder.Services.AddSingleton<MemoryCacheQueue>();
+        
+        builder.Services.AddLogging();
 
         return new InMemorySessionTrackerBuilder(builder);
     }

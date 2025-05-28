@@ -59,6 +59,8 @@ public static class SessionTrackerBuilderExtensions
 
         builder.Services.AddSingleton<DistributedLockNameCreator>();
 
+        builder.Services.AddLogging();
+
         return new DistributedLockSessionTrackerBuilder(builder);
     }
 }

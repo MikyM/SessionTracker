@@ -105,6 +105,8 @@ public static class SessionTrackerBuilderExtensions
         builder.AddDataProvider<RedisSessionDataProvider>();
 
         builder.Services.AddSingleton<RedisSessionTrackerKeyCreator>();
+        
+        builder.Services.AddLogging();
 
         return new RedisSessionTrackerBuilder(builder);
     }

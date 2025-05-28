@@ -30,6 +30,7 @@
 
     <ItemGroup>
       <PackageReference Include="DistributedLock" Version="2.6.0" />
+      <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.5" />
     </ItemGroup>
 
 </Project>
