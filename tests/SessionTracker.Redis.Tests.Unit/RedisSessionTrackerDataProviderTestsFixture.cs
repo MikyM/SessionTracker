@@ -49,7 +49,7 @@ public class RedisSessionTrackerDataProviderTestsFixture
             JsonSettingsMock.Object, KeyCreator, new ConfigurationOptions()
             {
                 Proxy = Proxy.None
-            });
+            }, TimeProvider.System);
         
         var optimizedOpt = new RedisSessionTrackerSettings()
         {
@@ -63,13 +63,13 @@ public class RedisSessionTrackerDataProviderTestsFixture
             JsonSettingsMock.Object, KeyCreator, new ConfigurationOptions()
             {
                 Proxy = Proxy.Envoyproxy
-            });
+            }, TimeProvider.System);
     }
 
     public RedisSessionDataProvider DataProvider { get; }
     public RedisSessionDataProvider DataProviderOptimized { get; }
     
-    public RedisSessionLockProvider GetLockProvider(IDistributedLockFactory redLockFactory) => new(redLockFactory, KeyCreator);
+    public RedisSessionLockProvider GetLockProvider(IDistributedLockFactory redLockFactory) => new(redLockFactory, KeyCreator, TimeProvider.System);
 
     public void Reset()
     {

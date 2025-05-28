@@ -183,6 +183,22 @@ public class SessionTracker : ISessionTracker
             return new ExceptionError(ex);
         }
     }
+    
+    /// <inheritdoc />
+    public async Task<Result> StartAsync<TSession>(TSession session, SessionEntryOptions options, CancellationToken ct = default)
+        where TSession : Session
+    {
+        ct.ThrowIfCancellationRequested();
+
+        try
+        {
+            return await _dataProvider.AddAsync(session, options, ct);
+        }
+        catch (Exception ex)
+        {
+            return new ExceptionError(ex);
+        }
+    }
 
     /// <inheritdoc />
     public async Task<Result> RefreshAsync<TSession>(TSession session, CancellationToken ct = default)

@@ -25,6 +25,8 @@ public static class Helpers
 
         services.AddSingleton<InMemorySessionDataProvider>();
         
+        services.AddSingleton(TimeProvider.System);
+        
         var provider = services.BuildServiceProvider();
         
         return (provider.GetRequiredService<InMemorySessionDataProvider>(), provider, provider.GetRequiredService<IMemoryCache>(), provider.GetRequiredService<InMemorySessionTrackerKeyCreator>());
@@ -44,6 +46,8 @@ public static class Helpers
         services.AddLogging();
 
         services.AddSingleton<MemoryCacheQueue>();
+        
+        services.AddSingleton(TimeProvider.System);
 
         services.AddSingleton<InMemorySessionLockProvider>();
         

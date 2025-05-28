@@ -21,6 +21,7 @@
 //
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SessionTracker.Abstractions;
 
 namespace SessionTracker;
@@ -51,6 +52,8 @@ public static class ServiceCollectionExtensions
         
         var config = new SessionTrackerSettings();
         sessionConfiguration.Invoke(config);
+        
+        services.TryAddSingleton(TimeProvider.System);
 
         return new SessionTrackerBuilder(services, config);
     }

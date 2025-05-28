@@ -20,6 +20,7 @@ public class InMemorySessionLockProvider : ISessionLockProvider
     private readonly MemoryCacheQueue _cacheQueue;
     private readonly InMemorySessionTrackerKeyCreator _keyCreator;
     private readonly ILogger<InMemorySessionLockProvider> _logger;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// Creates a new instance of <see cref="InMemorySessionLockProvider"/>.
@@ -27,11 +28,14 @@ public class InMemorySessionLockProvider : ISessionLockProvider
     /// <param name="cacheQueue">The cache queue.</param>
     /// <param name="keyCreator">Key creator.</param>
     /// <param name="logger">Logger.</param>
-    public InMemorySessionLockProvider(MemoryCacheQueue cacheQueue, InMemorySessionTrackerKeyCreator keyCreator, ILogger<InMemorySessionLockProvider> logger)
+    /// <param name="timeProvider">Time provider.</param>
+    public InMemorySessionLockProvider(MemoryCacheQueue cacheQueue, InMemorySessionTrackerKeyCreator keyCreator, 
+        ILogger<InMemorySessionLockProvider> logger, TimeProvider timeProvider)
     {
         _cacheQueue = cacheQueue;
         _keyCreator = keyCreator;
         _logger = logger;
+        _timeProvider = timeProvider;
     }
 
     private async Task<InMemorySessionLock> AcquirePrivateAsync<TSession>(string resource, TimeSpan lockExpirationTime)
@@ -52,11 +56,11 @@ public class InMemorySessionLockProvider : ISessionLockProvider
             if (exists)
             {
                 return new InMemorySessionLock(lockKey, lockId, false, SessionLockStatus.Conflicted, null,
-                    DateTimeOffset.UtcNow.Add(lockExpirationTime));
+                    _timeProvider.GetUtcNow().Add(lockExpirationTime));
             }
 
             var lc = new InMemorySessionLock(lockKey, lockId, true, SessionLockStatus.Acquired, _cacheQueue,
-                DateTimeOffset.UtcNow.Add(lockExpirationTime));
+                _timeProvider.GetUtcNow().Add(lockExpirationTime));
 
             var expToken =
                 new CancellationChangeToken(

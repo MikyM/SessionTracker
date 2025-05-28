@@ -84,6 +84,8 @@ public static class SessionTrackerBuilderExtensions
         }
         
         builder.Services.Configure(redisSessionConfiguration);
+        
+        builder.Services.TryAddSingleton(TimeProvider.System);
 
         if (redisOpt.SkipLockFactoryCreation)
         {

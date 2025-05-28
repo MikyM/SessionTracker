@@ -22,6 +22,7 @@
 
 using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace SessionTracker.InMemory;
 
@@ -50,6 +51,8 @@ public static class SessionTrackerBuilderExtensions
         builder.Services.AddOptions();
         
         builder.Services.Configure(settingsConfiguration);
+        
+        builder.Services.TryAddSingleton(TimeProvider.System);
 
         if (memoryOpt.ShouldRegisterMemoryCache)
         {

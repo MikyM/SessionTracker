@@ -1,6 +1,5 @@
 ﻿using JetBrains.Annotations;
 using RedLockNet;
-using RedLockNet.SERedis;
 using Remora.Results;
 using SessionTracker.Abstractions;
 
@@ -14,16 +13,19 @@ public sealed class RedisSessionLockProvider : ISessionLockProvider
 {
     private readonly IDistributedLockFactory _lockFactory;
     private readonly RedisSessionTrackerKeyCreator _keyCreator;
+    private readonly TimeProvider _timeProvider;
 
     /// <summary>
     /// Creates a new instance of <see cref="RedisSessionLockProvider"/>.
     /// </summary>
     /// <param name="lockFactory">Inner factory.</param>
     /// <param name="keyCreator">Key creator.</param>
-    public RedisSessionLockProvider(IDistributedLockFactory lockFactory, RedisSessionTrackerKeyCreator keyCreator)
+    /// <param name="timeProvider">Time provider.</param>
+    public RedisSessionLockProvider(IDistributedLockFactory lockFactory, RedisSessionTrackerKeyCreator keyCreator, TimeProvider timeProvider)
     {
         _lockFactory = lockFactory;
         _keyCreator = keyCreator;
+        _timeProvider = timeProvider;
     }
 
 
@@ -44,7 +46,7 @@ public sealed class RedisSessionLockProvider : ISessionLockProvider
             if (!lockRes.IsAcquired)
                 return new SessionLockNotAcquiredError(RedisSessionLock.TranslateRedLockStatus(lockRes.Status));
 
-            return new RedisSessionLock(lockRes,DateTimeOffset.UtcNow.Add(lockExpirationTime));
+            return new RedisSessionLock(lockRes,_timeProvider.GetUtcNow().Add(lockExpirationTime));
         }
         catch (Exception ex)
         {
@@ -67,7 +69,7 @@ public sealed class RedisSessionLockProvider : ISessionLockProvider
             if (!lockRes.IsAcquired)
                 return new SessionLockNotAcquiredError(RedisSessionLock.TranslateRedLockStatus(lockRes.Status));
 
-            return new RedisSessionLock(lockRes,DateTimeOffset.UtcNow.Add(lockExpirationTime));
+            return new RedisSessionLock(lockRes,_timeProvider.GetUtcNow().Add(lockExpirationTime));
         }
         catch (Exception ex)
         {

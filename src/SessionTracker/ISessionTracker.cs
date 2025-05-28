@@ -117,6 +117,17 @@ public interface ISessionTracker
     Task<Result> StartAsync<TSession>(TSession session, CancellationToken ct = default) where TSession : Session;
 
     /// <summary>
+    /// Attempts to add a session to the underlying backing store.
+    /// </summary>
+    /// <remarks>This is guaranteed to be an atomic operation.</remarks>
+    /// <param name="session">The session to add.</param>
+    /// <param name="options">Entry options.</param>
+    /// <param name="ct">Cancellation token.</param>
+    /// <typeparam name="TSession">Type of the session.</typeparam>
+    /// <returns>The result of the operation that may or not have succeeded.</returns>
+    Task<Result> StartAsync<TSession>(TSession session, SessionEntryOptions options, CancellationToken ct = default) where TSession : Session;
+
+    /// <summary>
     /// Attempts to refresh session's sliding expiration.
     /// </summary>
     /// <remarks>This is guaranteed to be an atomic operation.</remarks>

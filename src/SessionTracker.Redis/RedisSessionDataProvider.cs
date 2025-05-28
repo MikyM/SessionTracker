@@ -50,6 +50,7 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly RedisSessionTrackerSettings _options;
     private readonly ILogger<RedisSessionDataProvider> _logger;
+    private readonly TimeProvider _timeProvider;
     
     private Dictionary<string, (byte[] Sha1, string Raw)> _knownInternalScripts = [];
     
@@ -94,7 +95,7 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
 
     internal RedisSessionDataProvider(IOptions<RedisSessionTrackerSettings> optionsAccessor,
         IConnectionMultiplexer multiplexer, ILogger<RedisSessionDataProvider> logger, IOptionsMonitor<JsonSerializerOptions> jsonOptions,
-        RedisSessionTrackerKeyCreator keyCreator, ConfigurationOptions seRedisConfigurationOptions)
+        RedisSessionTrackerKeyCreator keyCreator, ConfigurationOptions seRedisConfigurationOptions, TimeProvider timeProvider)
     {
         _jsonOptions = jsonOptions.Get(RedisSessionTrackerSettings.JsonSerializerName);
         _cache = multiplexer.GetDatabase();
@@ -110,7 +111,8 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
         _keyCreator = keyCreator;
 
         _seRedisConfigurationOptions = seRedisConfigurationOptions;
-        
+        _timeProvider = timeProvider;
+
         PreHashScripts();
     }
 
@@ -122,8 +124,9 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
     /// <param name="logger">The logger.</param>
     /// <param name="jsonOptions">Json options.</param>
     /// <param name="keyCreator">The key creator.</param>
+    /// <param name="timeProvider">Time provider.</param>
     public RedisSessionDataProvider(IOptions<RedisSessionTrackerSettings> optionsAccessor, IConnectionMultiplexer multiplexer,
-        ILogger<RedisSessionDataProvider> logger, IOptionsMonitor<JsonSerializerOptions> jsonOptions, RedisSessionTrackerKeyCreator keyCreator)
+        ILogger<RedisSessionDataProvider> logger, IOptionsMonitor<JsonSerializerOptions> jsonOptions, RedisSessionTrackerKeyCreator keyCreator, TimeProvider timeProvider)
     {
         _jsonOptions = jsonOptions.Get(RedisSessionTrackerSettings.JsonSerializerName);
         _cache = multiplexer.GetDatabase();
@@ -134,6 +137,7 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
         _options = optionsAccessor.Value;
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         _keyCreator = keyCreator;
+        _timeProvider = timeProvider;
 
         _seRedisConfigurationOptions ??= GetOptions(multiplexer);
         
@@ -269,7 +273,7 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
 
         try
         {
-            var creationTime = DateTimeOffset.UtcNow;
+            var creationTime = _timeProvider.GetUtcNow();
 
             var absoluteExpiration = GetAbsoluteExpiration(creationTime, options);
 
@@ -482,7 +486,7 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
         
         try
         {
-            var creationTime = DateTimeOffset.UtcNow;
+            var creationTime = _timeProvider.GetUtcNow();
 
             var absoluteExpiration = GetAbsoluteExpiration(creationTime, options);
             
@@ -554,7 +558,7 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
 
         try
         {
-            var creationTime = DateTimeOffset.UtcNow;
+            var creationTime = _timeProvider.GetUtcNow();
 
             var absoluteExpiration = GetAbsoluteExpiration(creationTime, options);
 

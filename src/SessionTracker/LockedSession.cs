@@ -30,7 +30,7 @@ namespace SessionTracker;
 /// </summary>
 /// <typeparam name="TSession">The session type.</typeparam>
 [PublicAPI]
-public sealed class LockedSession<TSession> : ILockedSession<TSession>, IEquatable<LockedSession<TSession>>, IAsyncDisposable, IEquatable<ILockedSession<TSession>> where TSession : Session
+public sealed class LockedSession<TSession> : ILockedSession<TSession>, IEquatable<LockedSession<TSession>>, IDisposable, IAsyncDisposable, IEquatable<ILockedSession<TSession>> where TSession : Session
 {
     internal LockedSession(TSession session, ISessionLock @lock)
     {
@@ -50,6 +50,12 @@ public sealed class LockedSession<TSession> : ILockedSession<TSession>, IEquatab
     /// </summary>
     public async ValueTask DisposeAsync()
         => await Lock.DisposeAsync();
+    
+    /// <summary>
+    /// Releases the lock associated with the locked session.
+    /// </summary>
+    public void Dispose()
+        => Lock.Dispose();
 
     /// <inheritdoc />
     public bool Equals(ILockedSession<TSession>? other)
