@@ -24,6 +24,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.InMemory.Tes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.Tests.Shared", "..\tests\SessionTracker.Tests.Shared\SessionTracker.Tests.Shared.csproj", "{16D90999-7145-4B12-971B-9999E9E6564A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SessionTracker.DistributedLock", "SessionTracker.DistributedLock\SessionTracker.DistributedLock.csproj", "{9764D5C0-91E9-4C8D-AD4C-857E103785C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +68,10 @@ Global
 		{16D90999-7145-4B12-971B-9999E9E6564A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{16D90999-7145-4B12-971B-9999E9E6564A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{16D90999-7145-4B12-971B-9999E9E6564A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9764D5C0-91E9-4C8D-AD4C-857E103785C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9764D5C0-91E9-4C8D-AD4C-857E103785C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9764D5C0-91E9-4C8D-AD4C-857E103785C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9764D5C0-91E9-4C8D-AD4C-857E103785C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{C965A133-C660-499A-868C-8B32A85B03A7} = {A2F95228-C5C6-4417-AC18-0F32FE0D499F}

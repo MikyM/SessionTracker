@@ -1,5 +1,4 @@
-﻿using System.Collections.Concurrent;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -170,8 +169,6 @@ public class InMemorySessionLockProvider : ISessionLockProvider
     /// <inheritdoc/>
     public async Task<Result<ISessionLock>> AcquireAsync<TSession>(string resource, TimeSpan lockExpirationTime, CancellationToken ct = default) where TSession : Session
     {
-        var lockId = CreateLockId();
-
         var acquireResult =  await AcquirePrivateAsync<TSession>(resource, lockExpirationTime);
 
         if (!acquireResult.IsAcquired)
