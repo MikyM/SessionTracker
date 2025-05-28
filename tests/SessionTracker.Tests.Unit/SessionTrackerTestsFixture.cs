@@ -10,7 +10,7 @@ public class SessionTrackerTestsFixture
     public readonly Mock<IOptions<SessionTrackerSettings>> SettingsMock = new();
     public readonly Mock<ISessionLockProvider> LockProviderMock = new();
     
-    public Session Session => new(TestSessionKey);
+    public global::SessionTracker.Session Session => new(TestSessionKey);
     public string TestSessionKey => "test";
     public CancellationTokenSource Cts => new ();
 

@@ -27,7 +27,7 @@ public class MemoryCacheQueue
     /// <param name="asyncFunction">The action to queue.</param>
     /// <typeparam name="T">The result type.</typeparam>
     /// <returns>A task representing the async operation.</returns>
-    public async Task<T> Enqueue<T>(Func<IMemoryCache,Task<T>> asyncFunction)
+    public async Task<T> EnqueueAsync<T>(Func<IMemoryCache,Task<T>> asyncFunction)
     {
         // see https://devblogs.microsoft.com/premier-developer/the-danger-of-taskcompletionsourcet-class/
         var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -60,7 +60,7 @@ public class MemoryCacheQueue
     /// <param name="function">The action to queue.</param>
     /// <typeparam name="T">The result type.</typeparam>
     /// <returns>A task representing the async operation.</returns>
-    public async Task<T> Enqueue<T>(Func<IMemoryCache,T> function)
+    public async Task<T> EnqueueAsync<T>(Func<IMemoryCache,T> function)
     {
         // see https://devblogs.microsoft.com/premier-developer/the-danger-of-taskcompletionsourcet-class/
         var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -81,7 +81,7 @@ public class MemoryCacheQueue
     /// </summary>
     /// <param name="asyncFunction">The action to queue.</param>
     /// <returns>A task representing the async operation.</returns>
-    public async Task Enqueue(Func<IMemoryCache,Task> asyncFunction)
+    public async Task EnqueueAsync(Func<IMemoryCache,Task> asyncFunction)
     {
         // see https://devblogs.microsoft.com/premier-developer/the-danger-of-taskcompletionsourcet-class/
         var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -102,7 +102,7 @@ public class MemoryCacheQueue
     /// </summary>
     /// <param name="function">The action to queue.</param>
     /// <returns>A task representing the async operation.</returns>
-    public async Task Enqueue(Action<IMemoryCache> function)
+    public async Task EnqueueAsync(Action<IMemoryCache> function)
     {
         // see https://devblogs.microsoft.com/premier-developer/the-danger-of-taskcompletionsourcet-class/
         var tcs = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);

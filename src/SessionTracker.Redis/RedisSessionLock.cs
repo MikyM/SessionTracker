@@ -32,10 +32,14 @@ namespace SessionTracker.Redis;
 [PublicAPI]
 public sealed class RedisSessionLock : ISessionLock, IEquatable<RedisSessionLock>
 {
-    internal RedisSessionLock(IRedLock redLock)
+    internal RedisSessionLock(IRedLock redLock, DateTimeOffset expiresAt)
     {
         _redLock = redLock;
+        ExpiresAt = expiresAt;
     }
+
+    /// <inheritdoc />
+    public DateTimeOffset ExpiresAt { get; }
 
     /// <inheritdoc />
     public string Resource => _redLock.Resource;

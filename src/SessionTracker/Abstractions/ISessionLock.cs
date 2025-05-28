@@ -29,6 +29,11 @@ namespace SessionTracker.Abstractions;
 public interface ISessionLock : IAsyncDisposable, IDisposable, IEquatable<ISessionLock>
 {
     /// <summary>
+    /// Gets the absolute expiration time.
+    /// </summary>
+    DateTimeOffset ExpiresAt { get; }
+    
+    /// <summary>
     /// The resource on which the lock was acquired.
     /// </summary>
     string Resource { get; }

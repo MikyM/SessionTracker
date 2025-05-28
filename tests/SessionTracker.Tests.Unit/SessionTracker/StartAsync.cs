@@ -53,7 +53,7 @@ public partial class SessionTracker
             _fixture.Reset();
             var ex = new InvalidOperationException();
             _fixture.DataProviderMock.Setup(x =>
-                    x.AddAsync(It.IsAny<Session>(), It.IsAny<SessionEntryOptions>(), It.IsAny<CancellationToken>()))
+                    x.AddAsync(It.IsAny<global::SessionTracker.Session>(), It.IsAny<SessionEntryOptions>(), It.IsAny<CancellationToken>()))
                 .ThrowsAsync(ex);
 
             // Act 
@@ -71,9 +71,9 @@ public partial class SessionTracker
         {
             // Arrange
             _fixture.Reset();
-            var expected = _fixture.SettingsMock.Object.Value.GetSessionEntryOptions<Session>();
+            var expected = _fixture.SettingsMock.Object.Value.GetSessionEntryOptions<global::SessionTracker.Session>();
             _fixture.DataProviderMock.Setup(x =>
-                x.AddAsync(It.IsAny<Session>(),
+                x.AddAsync(It.IsAny<global::SessionTracker.Session>(),
                     It.Is<SessionEntryOptions>(y =>
                         y.AbsoluteExpiration == expected.AbsoluteExpiration &&
                         y.SlidingExpiration == expected.SlidingExpiration &&
@@ -86,7 +86,7 @@ public partial class SessionTracker
             // Assert
             Assert.True((bool)result.IsSuccess);
             _fixture.DataProviderMock.Verify(x =>
-                x.AddAsync(It.IsAny<Session>(),
+                x.AddAsync(It.IsAny<global::SessionTracker.Session>(),
                     It.Is<SessionEntryOptions>(y =>
                         y.AbsoluteExpiration == expected.AbsoluteExpiration &&
                         y.SlidingExpiration == expected.SlidingExpiration &&
@@ -101,7 +101,7 @@ public partial class SessionTracker
             _fixture.Reset();
             var cts = _fixture.Cts;
             _fixture.DataProviderMock.Setup(x =>
-                x.AddAsync(It.IsAny<Session>(),
+                x.AddAsync(It.IsAny<global::SessionTracker.Session>(),
                     It.IsAny<SessionEntryOptions>(), cts.Token)).ReturnsAsync(Result.FromSuccess());
 
             // Act 
@@ -110,7 +110,7 @@ public partial class SessionTracker
             // Assert
             Assert.True((bool)result.IsSuccess);
             _fixture.DataProviderMock.Verify(x =>
-                x.AddAsync(It.IsAny<Session>(),
+                x.AddAsync(It.IsAny<global::SessionTracker.Session>(),
                     It.IsAny<SessionEntryOptions>(),
                     cts.Token), Times.Once);
         }
@@ -124,7 +124,7 @@ public partial class SessionTracker
             var error = new InvalidOperationError();
 
             _fixture.DataProviderMock.Setup(x =>
-                x.AddAsync(It.IsAny<Session>(),
+                x.AddAsync(It.IsAny<global::SessionTracker.Session>(),
                     It.IsAny<SessionEntryOptions>(), cts.Token)).ReturnsAsync(error);
 
             // Act 
@@ -137,7 +137,7 @@ public partial class SessionTracker
             Assert.Same(error, result.Error);
 
             _fixture.DataProviderMock.Verify(x =>
-                x.AddAsync(It.IsAny<Session>(),
+                x.AddAsync(It.IsAny<global::SessionTracker.Session>(),
                     It.IsAny<SessionEntryOptions>(),
                     cts.Token), Times.Once);
         }

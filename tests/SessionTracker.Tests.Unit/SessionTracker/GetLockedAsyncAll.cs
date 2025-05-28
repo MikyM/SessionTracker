@@ -22,7 +22,7 @@ public partial class SessionTracker
 
             // Act && Assert
             await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-                await _fixture.Service.GetLockedAsync<Session>(_fixture.TestSessionKey, new TimeSpan(), new TimeSpan(),
+                await _fixture.Service.GetLockedAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, new TimeSpan(), new TimeSpan(),
                     new TimeSpan(), cts.Token));
         }
 
@@ -39,15 +39,15 @@ public partial class SessionTracker
             var returnedSession = _fixture.Session;
 
             _fixture.LockProviderMock.Setup(x =>
-                    x.AcquireAsync<Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token))
+                    x.AcquireAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token))
                 .ReturnsAsync(Result<ISessionLock>.FromSuccess(returnedLock.Object));
             _fixture.DataProviderMock.Setup(x =>
-                    x.GetAsync<Session>(_fixture.TestSessionKey, cts.Token))
-                .ReturnsAsync(Result<Session>.FromSuccess(returnedSession));
+                    x.GetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token))
+                .ReturnsAsync(Result<global::SessionTracker.Session>.FromSuccess(returnedSession));
 
             // Act 
             var result =
-                await _fixture.Service.GetLockedAsync<Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token);
+                await _fixture.Service.GetLockedAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token);
 
             // Assert
             Assert.True((bool)result.IsSuccess);
@@ -56,8 +56,8 @@ public partial class SessionTracker
             Assert.Same(result.Entity.Session, returnedSession);
 
             _fixture.LockProviderMock.Verify(
-                x => x.AcquireAsync<Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token), Times.Once);
-            _fixture.DataProviderMock.Verify(x => x.GetAsync<Session>(_fixture.TestSessionKey, cts.Token), Times.Once);
+                x => x.AcquireAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token), Times.Once);
+            _fixture.DataProviderMock.Verify(x => x.GetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token), Times.Once);
         }
 
         [Fact]
@@ -73,15 +73,15 @@ public partial class SessionTracker
             var returnedSession = _fixture.Session;
 
             _fixture.LockProviderMock.Setup(x =>
-                    x.AcquireAsync<Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token))
+                    x.AcquireAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token))
                 .ReturnsAsync(error);
             _fixture.DataProviderMock.Setup(x =>
-                    x.GetAsync<Session>(_fixture.TestSessionKey, cts.Token))
-                .ReturnsAsync(Result<Session>.FromSuccess(returnedSession));
+                    x.GetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token))
+                .ReturnsAsync(Result<global::SessionTracker.Session>.FromSuccess(returnedSession));
 
             // Act 
             var result =
-                await _fixture.Service.GetLockedAsync<Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token);
+                await _fixture.Service.GetLockedAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token);
 
             // Assert
             Assert.False((bool)result.IsSuccess);
@@ -90,8 +90,8 @@ public partial class SessionTracker
             Assert.Same(error, result.Error);
 
             _fixture.LockProviderMock.Verify(
-                x => x.AcquireAsync<Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token), Times.Once);
-            _fixture.DataProviderMock.Verify(x => x.GetAsync<Session>(_fixture.TestSessionKey, cts.Token), Times.Never);
+                x => x.AcquireAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token), Times.Once);
+            _fixture.DataProviderMock.Verify(x => x.GetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token), Times.Never);
         }
 
         [Fact]
@@ -107,15 +107,15 @@ public partial class SessionTracker
             var returnedLock = new Mock<ISessionLock>();
 
             _fixture.LockProviderMock.Setup(x =>
-                    x.AcquireAsync<Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token))
+                    x.AcquireAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token))
                 .ReturnsAsync(Result<ISessionLock>.FromSuccess(returnedLock.Object));
             _fixture.DataProviderMock.Setup(x =>
-                    x.GetAsync<Session>(_fixture.TestSessionKey, cts.Token))
+                    x.GetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token))
                 .ReturnsAsync(error);
 
             // Act 
             var result =
-                await _fixture.Service.GetLockedAsync<Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token);
+                await _fixture.Service.GetLockedAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token);
 
             // Assert
             Assert.False((bool)result.IsSuccess);
@@ -124,8 +124,8 @@ public partial class SessionTracker
             Assert.Same(error, result.Error);
 
             _fixture.LockProviderMock.Verify(
-                x => x.AcquireAsync<Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token), Times.Once);
-            _fixture.DataProviderMock.Verify(x => x.GetAsync<Session>(_fixture.TestSessionKey, cts.Token), Times.Once);
+                x => x.AcquireAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, expiry, wait, retry, cts.Token), Times.Once);
+            _fixture.DataProviderMock.Verify(x => x.GetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token), Times.Once);
         }
         
         [Fact]
@@ -138,13 +138,13 @@ public partial class SessionTracker
             var @lock = new Mock<ISessionLock>();
         
             _fixture.LockProviderMock.Setup(x =>
-                x.AcquireAsync<Session>(_fixture.TestSessionKey, It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>(),
+                x.AcquireAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>(),
                     It.IsAny<TimeSpan>(), It.IsAny<CancellationToken>())).ReturnsAsync(Result<ISessionLock>.FromSuccess(@lock.Object));
             _fixture.DataProviderMock.Setup(x =>
-                x.GetAsync<Session>(_fixture.TestSessionKey, cts.Token)).ThrowsAsync(ex);
+                x.GetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token)).ThrowsAsync(ex);
 
             // Act 
-            var result = await _fixture.Service.GetLockedAsync<Session>(_fixture.TestSessionKey, new TimeSpan(),
+            var result = await _fixture.Service.GetLockedAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, new TimeSpan(),
                 new TimeSpan(), new TimeSpan(), cts.Token);
 
             // Assert

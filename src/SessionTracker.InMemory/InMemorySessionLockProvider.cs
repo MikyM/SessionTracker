@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Primitives;
 using Remora.Results;
 using SessionTracker.Abstractions;
 
@@ -34,21 +35,46 @@ public class InMemorySessionLockProvider : ISessionLockProvider
         var lockId = CreateLockId();
         var lockKey = _keyCreator.CreateLockKey<TSession>(resource);
         
-        var acquireResult = await _cacheQueue.Enqueue(x =>
+        var acquireResult = await _cacheQueue.EnqueueAsync(x =>
         {
             var exists = x.TryGetValue(lockKey, out _);
 
             if (exists)
             {
-                return new InMemorySessionLock(lockKey, lockId, false, SessionLockStatus.Conflicted, null, lockExpirationTime);
+                return new InMemorySessionLock(lockKey, lockId, false, SessionLockStatus.Conflicted, null, DateTimeOffset.UtcNow.Add(lockExpirationTime));
             }
             
-            x.Set(lockKey, lockId, new MemoryCacheEntryOptions()
-            {
-                AbsoluteExpirationRelativeToNow = lockExpirationTime
-            });
+            var lc = new InMemorySessionLock(lockKey, lockId, true, SessionLockStatus.Acquired, _cacheQueue, DateTimeOffset.UtcNow.Add(lockExpirationTime));
+
+            var expToken = new CancellationChangeToken(new CancellationTokenSource(lockExpirationTime.Add(TimeSpan.FromMilliseconds(20))).Token);
+
+            x.Set(lockKey, lc, new MemoryCacheEntryOptions()
+                .SetPriority(CacheItemPriority.NeverRemove)
+                .SetAbsoluteExpiration(lockExpirationTime)
+                .AddExpirationToken(expToken)
+                .RegisterPostEvictionCallback((a, b, c, _) =>
+                {
+                    if (b is not InMemorySessionLock @lock)
+                    {
+                        return;
+                    }
+                            
+                    switch (c)
+                    {
+                        case EvictionReason.Capacity:
+                            throw new InvalidOperationException("Locks are being evicted from cache due to capacity limits");
+                        case EvictionReason.Replaced:
+                            throw new InvalidOperationException("Locks shouldn't be evicted from cache because of being replaced");
+                        case EvictionReason.Expired or EvictionReason.TokenExpired:
+                            @lock.SetExpired();
+                            break;
+                        case EvictionReason.Removed:
+                            @lock.SetUnlocked();
+                            break;
+                    }
+                }));
             
-            return new InMemorySessionLock(lockKey, lockId, true, SessionLockStatus.Acquired, _cacheQueue, lockExpirationTime);
+            return lc;
         });
         
         return acquireResult;
@@ -58,28 +84,35 @@ public class InMemorySessionLockProvider : ISessionLockProvider
     public async Task<Result<ISessionLock>> AcquireAsync<TSession>(string resource, TimeSpan lockExpirationTime, TimeSpan lockWaitTime, TimeSpan lockRetryTime,
         CancellationToken ct = default) where TSession : Session
     {
-        var stopwatch = Stopwatch.StartNew();
-            
-        var acquireResult = await AcquirePrivateAsync<TSession>(resource, lockExpirationTime);
-        
-        if (lockWaitTime.TotalMilliseconds > 0.0 && lockRetryTime.TotalMilliseconds > 0.0)
+        try
         {
-            while (!acquireResult.IsAcquired && stopwatch.Elapsed <= lockWaitTime)
+            var stopwatch = Stopwatch.StartNew();
+
+            var acquireResult = await AcquirePrivateAsync<TSession>(resource, lockExpirationTime);
+
+            if (lockWaitTime.TotalMilliseconds > 0.0 && lockRetryTime.TotalMilliseconds > 0.0)
             {
-                acquireResult = await AcquirePrivateAsync<TSession>(resource, lockExpirationTime);
-                if (!acquireResult.IsAcquired)
+                while (!acquireResult.IsAcquired && stopwatch.Elapsed <= lockWaitTime)
                 {
-                    await Task.Delay(lockRetryTime, ct).WaitAsync(ct);
+                    acquireResult = await AcquirePrivateAsync<TSession>(resource, lockExpirationTime);
+                    if (!acquireResult.IsAcquired)
+                    {
+                        await Task.Delay(lockRetryTime, ct).WaitAsync(ct);
+                    }
                 }
             }
-        }
 
-        if (!acquireResult.IsAcquired)
+            if (!acquireResult.IsAcquired)
+            {
+                return new SessionLockNotAcquiredError(acquireResult.Status);
+            }
+
+            return acquireResult;
+        }
+        catch (Exception ex)
         {
-            return new SessionLockNotAcquiredError(acquireResult.Status);
+            return ex;
         }
-
-        return acquireResult;
     }
 
     /// <inheritdoc/>

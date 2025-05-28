@@ -80,7 +80,7 @@ public partial class SessionTracker
             _fixture.Reset();
             var ex = new InvalidOperationException();
             _fixture.DataProviderMock.Setup(x =>
-                x.UpdateAndGetAsync(It.IsAny<Session>(), It.IsAny<CancellationToken>())).ThrowsAsync(ex);
+                x.UpdateAndGetAsync(It.IsAny<global::SessionTracker.Session>(), It.IsAny<CancellationToken>())).ThrowsAsync(ex);
 
             // Act 
             var result = await _fixture.Service.UpdateAndGetAsync(_fixture.Session, CancellationToken.None);

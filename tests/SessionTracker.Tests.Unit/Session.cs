@@ -4,7 +4,7 @@ namespace SessionTracker.Tests.Unit;
 
 [UsedImplicitly]
 [CollectionDefinition("Session")]
-public class SessionTests
+public class Session
 {
     [Collection("Session")]
     public class StateShould
@@ -21,7 +21,7 @@ public class SessionTests
             var key = "test";
         
             // Act
-            var session = new Session("test");
+            var session = new global::SessionTracker.Session("test");
         
             // Assert
         

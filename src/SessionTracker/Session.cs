@@ -47,6 +47,13 @@ public class Session : ISession, IEquatable<ISession>
     [JsonInclude]
     public long Version { get; internal set; } = 1;
 
+    /// <inheritdoc/>
+    public void SetProviderKeys(string regularKey, string evictedKey)
+    {
+        ProviderKey = regularKey;
+        EvictedProviderKey = evictedKey;
+    }
+
     /// <summary>
     /// Gets the time at which this session started.
     /// </summary>

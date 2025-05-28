@@ -12,17 +12,17 @@ namespace SessionTracker.InMemory;
 [PublicAPI]
 public class InMemorySessionDataProvider : ISessionDataProvider
 {
-    private readonly MemoryCacheQueue _cacheQueueQueue;
+    private readonly MemoryCacheQueue _cacheQueue;
     private readonly InMemorySessionTrackerKeyCreator _keyCreator;
 
     /// <summary>
     /// Creates a new instance of <see cref="InMemorySessionDataProvider"/>.
     /// </summary>
-    /// <param name="cacheQueueQueue">The underlying cache.</param>
+    /// <param name="cacheQueue">The underlying cache.</param>
     /// <param name="keyCreator">Key creator.</param>
-    public InMemorySessionDataProvider(MemoryCacheQueue cacheQueueQueue, InMemorySessionTrackerKeyCreator keyCreator)
+    public InMemorySessionDataProvider(MemoryCacheQueue cacheQueue, InMemorySessionTrackerKeyCreator keyCreator)
     {
-        _cacheQueueQueue = cacheQueueQueue;
+        _cacheQueue = cacheQueue;
         _keyCreator = keyCreator;
     }
     
@@ -36,7 +36,7 @@ public class InMemorySessionDataProvider : ISessionDataProvider
     {
         var keys = _keyCreator.CreateKeys<TSession>(key);
         
-        var result = await _cacheQueueQueue.Enqueue(memoryCache =>
+        var result = await _cacheQueue.EnqueueAsync(memoryCache =>
         {
             var nonEvicted = memoryCache.TryGetValue<TSession>(keys.Regular, out var session);
             if (nonEvicted)
@@ -44,7 +44,7 @@ public class InMemorySessionDataProvider : ISessionDataProvider
                 return new OperationResult<TSession>(session, null);
             }
             
-            var evicted = memoryCache.TryGetValue<TSession>(keys.Evicted, out _);
+            var evicted = memoryCache.TryGetValue(keys.Evicted, out _);
             
             return new OperationResult<TSession>(null, evicted);
         });
@@ -68,7 +68,7 @@ public class InMemorySessionDataProvider : ISessionDataProvider
     {
         var keys = _keyCreator.CreateKeys<TSession>(key);
         
-        var result = await _cacheQueueQueue.Enqueue(memoryCache =>
+        var result = await _cacheQueue.EnqueueAsync(memoryCache =>
         {
             var evicted = memoryCache.TryGetValue<TSession>(keys.Evicted, out var session);
             if (evicted)
@@ -76,7 +76,7 @@ public class InMemorySessionDataProvider : ISessionDataProvider
                 return new OperationResult<TSession>(session, null);
             }
             
-            var nonEvicted = memoryCache.TryGetValue<TSession>(keys.Regular, out _);
+            var nonEvicted = memoryCache.TryGetValue(keys.Regular, out _);
             
             return new OperationResult<TSession>(null, nonEvicted);
         });
@@ -99,7 +99,9 @@ public class InMemorySessionDataProvider : ISessionDataProvider
     {
         var keys = _keyCreator.CreateKeys<TSession>(session.Key);
         
-        var result = await _cacheQueueQueue.Enqueue(memoryCache =>
+        session.SetProviderKeys(keys.Regular, keys.Evicted);
+        
+        var result = await _cacheQueue.EnqueueAsync(memoryCache =>
         {
             var ongoingResult = memoryCache.TryGetValue<TSession>(keys.Regular, out var ongoing);
             if (ongoingResult)
@@ -125,7 +127,7 @@ public class InMemorySessionDataProvider : ISessionDataProvider
     {
         var keys = _keyCreator.CreateKeys<TSession>(key);
             
-        var result = await _cacheQueueQueue.Enqueue(memoryCache =>
+        var result = await _cacheQueue.EnqueueAsync(memoryCache =>
         {
             var regularResult = memoryCache.TryGetValue<TSession>(keys.Regular, out _);
             if (regularResult)
@@ -133,7 +135,7 @@ public class InMemorySessionDataProvider : ISessionDataProvider
                 return new OperationResult<TSession>(null, true);
             }
 
-            var evictedResult = memoryCache.TryGetValue<TSession>(keys.Evicted, out _);
+            var evictedResult = memoryCache.TryGetValue(keys.Evicted, out _);
             
             return new OperationResult<TSession>(null, evictedResult ? false : null);
         });
@@ -156,7 +158,7 @@ public class InMemorySessionDataProvider : ISessionDataProvider
     {
         var keys = _keyCreator.CreateKeys<TSession>(session.Key);
         
-        var result = await _cacheQueueQueue.Enqueue(memoryCache =>
+        var result = await _cacheQueue.EnqueueAsync(memoryCache =>
         {
             var regularResult = memoryCache.TryGetValue<TSession>(keys.Regular, out _);
 
@@ -207,7 +209,7 @@ public class InMemorySessionDataProvider : ISessionDataProvider
     {
         var keys = _keyCreator.CreateKeys<TSession>(key);
         
-        var result = await _cacheQueueQueue.Enqueue(memoryCache =>
+        var result = await _cacheQueue.EnqueueAsync(memoryCache =>
         {
             var regularResult = memoryCache.TryGetValue<TSession>(keys.Regular, out var ongoing);
 
@@ -219,12 +221,12 @@ public class InMemorySessionDataProvider : ISessionDataProvider
                 return new OperationResult<TSession>(ongoing, true);
             }
             
-            var evictedResult = memoryCache.TryGetValue<TSession>(keys.Regular, out _);
+            var evictedResult = memoryCache.TryGetValue(keys.Evicted, out _);
             
             return new OperationResult<TSession>(null, !evictedResult && !regularResult ? false : null);
         });
 
-        if (result is { Flag: true, Session: null })
+        if (result is { Flag: true, Session: not null })
         {
             return result.Session;
         }
@@ -251,7 +253,7 @@ public class InMemorySessionDataProvider : ISessionDataProvider
     {
         var keys = _keyCreator.CreateKeys<TSession>(key);
         
-        var result = await _cacheQueueQueue.Enqueue(memoryCache =>
+        var result = await _cacheQueue.EnqueueAsync(memoryCache =>
         {
             var evictedResult = memoryCache.TryGetValue<TSession>(keys.Evicted, out var evicted);
 
@@ -263,7 +265,7 @@ public class InMemorySessionDataProvider : ISessionDataProvider
                 return new OperationResult<TSession>(evicted, true);
             }
             
-            var regularResult = memoryCache.TryGetValue<TSession>(keys.Regular, out _);
+            var regularResult = memoryCache.TryGetValue(keys.Regular, out _);
             
             return new OperationResult<TSession>(null, !evictedResult && !regularResult ? false : null);
         });

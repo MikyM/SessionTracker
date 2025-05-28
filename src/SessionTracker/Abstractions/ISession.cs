@@ -20,6 +20,8 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 //
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace SessionTracker.Abstractions;
 
 /// <summary>
@@ -52,4 +54,12 @@ public interface ISession
     /// The version of the session for concurrent operation checks.
     /// </summary>
     long Version { get; }
+
+    /// <summary>
+    /// Sets the provider keys.
+    /// </summary>
+    /// <param name="regularKey">Regular session key in the underlying storage.</param>
+    /// <param name="evictedKey">Evicted session key in the underlying storage.</param>
+    [MemberNotNull(nameof(ProviderKey), nameof(EvictedProviderKey))]
+    void SetProviderKeys(string regularKey, string evictedKey);
 }

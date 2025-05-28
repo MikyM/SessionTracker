@@ -264,6 +264,8 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
         ct.ThrowIfCancellationRequested();
         
         var keys = _keyCreator.CreateKeys<TSession>(session.Key);
+        
+        session.SetProviderKeys(keys.Regular, keys.Evicted);
 
         try
         {

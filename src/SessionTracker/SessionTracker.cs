@@ -40,7 +40,6 @@ public class SessionTracker : ISessionTracker
     /// <param name="dataProvider">The cache data provider.</param>
     /// <param name="lockProvider">The lock provider.</param>
     /// <param name="settings">The cache settings.</param>
-    /// <param name="sessionKeyCreator">Session key creator.</param>
     public SessionTracker(ISessionDataProvider dataProvider, ISessionLockProvider lockProvider, IOptions<SessionTrackerSettings> settings)
     {
         _dataProvider = dataProvider;

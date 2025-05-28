@@ -11,9 +11,7 @@ namespace SessionTracker.InMemory;
 public sealed class InMemorySessionLock : ISessionLock, IEquatable<InMemorySessionLock>
 {
     private bool _disposed;
-    
-    private TimeSpan _expiryJitter = TimeSpan.FromMilliseconds(10);
-    
+
     /// <inheritdoc/>
     public async ValueTask DisposeAsync()
     {
@@ -27,22 +25,16 @@ public sealed class InMemorySessionLock : ISessionLock, IEquatable<InMemorySessi
             if (_cacheQueue is null) 
                 return;
             
-            var status = await _cacheQueue.Enqueue(x =>
+            await _cacheQueue.EnqueueAsync(x =>
             {
                 var currentExists = x.TryGetValue<string>(Resource, out var value);
 
                 if (currentExists && value == Id)
                 {
                     x.Remove(Resource);
-
-                    return SessionLockStatus.Unlocked;
                 }
-
-                return SessionLockStatus.Expired;
             });
-
-            Status = status;
-            IsAcquired = false;
+            
             _cacheQueue = null;
         }
         finally
@@ -64,22 +56,16 @@ public sealed class InMemorySessionLock : ISessionLock, IEquatable<InMemorySessi
             if (_cacheQueue is null) 
                 return;
             
-            var status = _cacheQueue.Enqueue(x =>
+            _cacheQueue.EnqueueAsync(x =>
             {
                 var currentExists = x.TryGetValue<string>(Resource, out var value);
 
                 if (currentExists && value == Id)
                 {
                     x.Remove(Resource);
-
-                    return SessionLockStatus.Unlocked;
                 }
-
-                return SessionLockStatus.Expired;
             }).GetAwaiter().GetResult();
 
-            Status = status;
-            IsAcquired = false;
             _cacheQueue = null;
         }
         finally
@@ -88,7 +74,7 @@ public sealed class InMemorySessionLock : ISessionLock, IEquatable<InMemorySessi
         }
     }
 
-    internal InMemorySessionLock(string resource, string id, bool isAcquired, SessionLockStatus status, MemoryCacheQueue? cacheQueue, TimeSpan expirationTime)
+    internal InMemorySessionLock(string resource, string id, bool isAcquired, SessionLockStatus status, MemoryCacheQueue? cacheQueue, DateTimeOffset expirationTime)
     {
         Resource = resource;
         Id = id;
@@ -96,29 +82,12 @@ public sealed class InMemorySessionLock : ISessionLock, IEquatable<InMemorySessi
         Status = status;
         
         _cacheQueue = cacheQueue;
-
-        if (isAcquired && status is SessionLockStatus.Acquired)
-        {
-            _ = Task.Run(async () =>
-            {
-                try
-                {
-                    await Task.Delay(expirationTime.Subtract(_expiryJitter));
-
-                    if (isAcquired && status is SessionLockStatus.Acquired)
-                    {
-                        Status = SessionLockStatus.Expired;
-                    }
-                }
-                catch
-                {
-                    // ignore
-                }
-            });
-        }
     }
     
     private MemoryCacheQueue? _cacheQueue;
+
+    /// <inheritdoc/>
+    public DateTimeOffset ExpiresAt { get; }
 
     /// <inheritdoc/>
     public string Resource { get; }
@@ -128,6 +97,18 @@ public sealed class InMemorySessionLock : ISessionLock, IEquatable<InMemorySessi
     public bool IsAcquired { get; private set; }
     /// <inheritdoc/>
     public SessionLockStatus Status { get; private set; }
+
+    internal void SetExpired()
+    {
+        IsAcquired = false;
+        Status = SessionLockStatus.Expired;
+    }
+    
+    internal void SetUnlocked()
+    {
+        IsAcquired = false;
+        Status = SessionLockStatus.Unlocked;
+    }
 
     /// <inheritdoc/>
     public bool Equals(InMemorySessionLock? other)

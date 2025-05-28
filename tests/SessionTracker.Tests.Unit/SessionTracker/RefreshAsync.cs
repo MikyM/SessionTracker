@@ -19,10 +19,10 @@ public partial class SessionTracker
             _fixture.Reset();
             var ex = new InvalidOperationException();
             _fixture.DataProviderMock.Setup(x =>
-                x.RefreshAsync<Session>(_fixture.TestSessionKey, It.IsAny<CancellationToken>())).ThrowsAsync(ex);
+                x.RefreshAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, It.IsAny<CancellationToken>())).ThrowsAsync(ex);
 
             // Act 
-            var result = await _fixture.Service.RefreshAsync<Session>(_fixture.TestSessionKey, CancellationToken.None);
+            var result = await _fixture.Service.RefreshAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, CancellationToken.None);
 
             // Assert
             Assert.False((bool)result.IsSuccess);
@@ -38,15 +38,15 @@ public partial class SessionTracker
             _fixture.Reset();
             var cts = _fixture.Cts;
             _fixture.DataProviderMock.Setup(x =>
-                x.RefreshAsync<Session>(_fixture.TestSessionKey, cts.Token)).ReturnsAsync(Result.FromSuccess());
+                x.RefreshAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token)).ReturnsAsync(Result.FromSuccess());
 
             // Act 
-            var result = await _fixture.Service.RefreshAsync<Session>(_fixture.TestSessionKey, cts.Token);
+            var result = await _fixture.Service.RefreshAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token);
 
             // Assert
             Assert.True((bool)result.IsSuccess);
             _fixture.DataProviderMock.Verify(x =>
-                x.RefreshAsync<Session>(_fixture.TestSessionKey,
+                x.RefreshAsync<global::SessionTracker.Session>(_fixture.TestSessionKey,
                     cts.Token), Times.Once);
         }
 
@@ -59,10 +59,10 @@ public partial class SessionTracker
             var error = new InvalidOperationError();
 
             _fixture.DataProviderMock.Setup(x =>
-                x.RefreshAsync<Session>(_fixture.TestSessionKey, cts.Token)).ReturnsAsync(error);
+                x.RefreshAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token)).ReturnsAsync(error);
 
             // Act 
-            var result = await _fixture.Service.RefreshAsync<Session>(_fixture.TestSessionKey, cts.Token);
+            var result = await _fixture.Service.RefreshAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token);
 
             // Assert
             Assert.False((bool)result.IsSuccess);
@@ -71,7 +71,7 @@ public partial class SessionTracker
             Assert.Same(error, result.Error);
 
             _fixture.DataProviderMock.Verify(x =>
-                x.RefreshAsync<Session>(_fixture.TestSessionKey,
+                x.RefreshAsync<global::SessionTracker.Session>(_fixture.TestSessionKey,
                     cts.Token), Times.Once);
         }
     }

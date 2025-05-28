@@ -22,7 +22,7 @@ public partial class SessionTracker
 
             // Act && Assert
             await Assert.ThrowsAsync<OperationCanceledException>(async () =>
-                await _fixture.Service.FinishAndGetAsync<Session>(_fixture.TestSessionKey, cts.Token));
+                await _fixture.Service.FinishAndGetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token));
         }
 
 
@@ -33,21 +33,21 @@ public partial class SessionTracker
             _fixture.Reset();
             var cts = _fixture.Cts;
             var session = _fixture.Session;
-            var options = _fixture.SettingsMock.Object.Value.GetEvictionSessionEntryOptions<Session>();
+            var options = _fixture.SettingsMock.Object.Value.GetEvictionSessionEntryOptions<global::SessionTracker.Session>();
             var returnedSession = _fixture.Session;
 
             _fixture.DataProviderMock.Setup(x =>
-                x.EvictAndGetAsync<Session>(session.Key, options, cts.Token)).ReturnsAsync(returnedSession);
+                x.EvictAndGetAsync<global::SessionTracker.Session>(session.Key, options, cts.Token)).ReturnsAsync(returnedSession);
 
             // Act 
-            var result = await _fixture.Service.FinishAndGetAsync<Session>(session.Key, cts.Token);
+            var result = await _fixture.Service.FinishAndGetAsync<global::SessionTracker.Session>(session.Key, cts.Token);
 
             // Assert
             Assert.True((bool)result.IsSuccess);
             Assert.NotNull(result.Entity);
             Assert.Equal(returnedSession, result.Entity);
 
-            _fixture.DataProviderMock.Verify(x => x.EvictAndGetAsync<Session>(session.Key, options, cts.Token),
+            _fixture.DataProviderMock.Verify(x => x.EvictAndGetAsync<global::SessionTracker.Session>(session.Key, options, cts.Token),
                 Times.Once);
         }
 
@@ -58,13 +58,13 @@ public partial class SessionTracker
             _fixture.Reset();
             var cts = _fixture.Cts;
             var error = new InvalidOperationError();
-            var options = _fixture.SettingsMock.Object.Value.GetEvictionSessionEntryOptions<Session>();
+            var options = _fixture.SettingsMock.Object.Value.GetEvictionSessionEntryOptions<global::SessionTracker.Session>();
 
             _fixture.DataProviderMock.Setup(x =>
-                x.EvictAndGetAsync<Session>(_fixture.TestSessionKey, options, cts.Token)).ReturnsAsync(error);
+                x.EvictAndGetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, options, cts.Token)).ReturnsAsync(error);
 
             // Act 
-            var result = await _fixture.Service.FinishAndGetAsync<Session>(_fixture.TestSessionKey, cts.Token);
+            var result = await _fixture.Service.FinishAndGetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, cts.Token);
 
             // Assert
             Assert.False((bool)result.IsSuccess);
@@ -73,7 +73,7 @@ public partial class SessionTracker
             Assert.Same(error, result.Error);
 
             _fixture.DataProviderMock.Verify(
-                x => x.EvictAndGetAsync<Session>(_fixture.TestSessionKey, options, cts.Token),
+                x => x.EvictAndGetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, options, cts.Token),
                 Times.Once);
         }
 
@@ -84,12 +84,12 @@ public partial class SessionTracker
             _fixture.Reset();
             var ex = new InvalidOperationException();
             _fixture.DataProviderMock.Setup(x =>
-                x.EvictAndGetAsync<Session>(It.IsAny<string>(), It.IsAny<SessionEntryOptions>(),
+                x.EvictAndGetAsync<global::SessionTracker.Session>(It.IsAny<string>(), It.IsAny<SessionEntryOptions>(),
                     It.IsAny<CancellationToken>())).ThrowsAsync(ex);
 
             // Act 
             var result =
-                await _fixture.Service.FinishAndGetAsync<Session>(_fixture.TestSessionKey, CancellationToken.None);
+                await _fixture.Service.FinishAndGetAsync<global::SessionTracker.Session>(_fixture.TestSessionKey, CancellationToken.None);
 
             // Assert
             Assert.False((bool)result.IsSuccess);

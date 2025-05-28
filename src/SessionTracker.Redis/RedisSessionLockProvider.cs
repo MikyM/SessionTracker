@@ -44,7 +44,7 @@ public sealed class RedisSessionLockProvider : ISessionLockProvider
             if (!lockRes.IsAcquired)
                 return new SessionLockNotAcquiredError(RedisSessionLock.TranslateRedLockStatus(lockRes.Status));
 
-            return new RedisSessionLock(lockRes);
+            return new RedisSessionLock(lockRes,DateTimeOffset.UtcNow.Add(lockExpirationTime));
         }
         catch (Exception ex)
         {
@@ -67,7 +67,7 @@ public sealed class RedisSessionLockProvider : ISessionLockProvider
             if (!lockRes.IsAcquired)
                 return new SessionLockNotAcquiredError(RedisSessionLock.TranslateRedLockStatus(lockRes.Status));
 
-            return new RedisSessionLock(lockRes);
+            return new RedisSessionLock(lockRes,DateTimeOffset.UtcNow.Add(lockExpirationTime));
         }
         catch (Exception ex)
         {
