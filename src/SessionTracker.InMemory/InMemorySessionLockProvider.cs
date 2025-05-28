@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Concurrent;
+using System.Diagnostics;
 using JetBrains.Annotations;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
@@ -46,7 +47,7 @@ public class InMemorySessionLockProvider : ISessionLockProvider
         var lockKey = _keyCreator.CreateLockKey<TSession>(resource);
 
         _logger.LogDebug(
-            "Attempting to acquire lock for {Resource} with {Exp} expiration time, assigned ID {Id}, assigned lock key {Key}",
+            "Attempting to acquire lock for {Resource} with {Exp} expiration time, assigned ID {Id}:, assigned lock key: {Key}",
             resource, lockExpirationTime, lockId, lockKey);
 
         var acquireResult = await _cacheQueue.EnqueueAsync(x =>
@@ -59,18 +60,28 @@ public class InMemorySessionLockProvider : ISessionLockProvider
                     _timeProvider.GetUtcNow().Add(lockExpirationTime));
             }
 
+            var cts = new CancellationTokenSource(lockExpirationTime.Add(TimeSpan.FromMilliseconds(20)));
+            
             var lc = new InMemorySessionLock(lockKey, lockId, true, SessionLockStatus.Acquired, _cacheQueue,
                 _timeProvider.GetUtcNow().Add(lockExpirationTime));
+            
+            var expToken = new CancellationChangeToken(cts.Token);
 
-            var expToken =
-                new CancellationChangeToken(
-                    new CancellationTokenSource(lockExpirationTime.Add(TimeSpan.FromMilliseconds(20))).Token);
+            expToken.RegisterChangeCallback(st =>
+            {
+                if (st is not CancellationTokenSource c)
+                {
+                    return;
+                }
+                
+                c.Dispose();
+            }, cts);
 
             x.Set(lockKey, lc, new MemoryCacheEntryOptions()
                 .SetPriority(CacheItemPriority.NeverRemove)
                 .SetAbsoluteExpiration(lockExpirationTime)
                 .AddExpirationToken(expToken)
-                .RegisterPostEvictionCallback((a, b, c, _) =>
+                .RegisterPostEvictionCallback((_, b, c, _) =>
                 {
                     if (b is not InMemorySessionLock @lock)
                     {
@@ -80,9 +91,11 @@ public class InMemorySessionLockProvider : ISessionLockProvider
                     switch (c)
                     {
                         case EvictionReason.Capacity:
+                            _logger.LogCritical("Locks are being evicted from cache due to capacity limits - Id {Id}, Resource: {Resource}", @lock.Id, @lock.Resource);
                             throw new InvalidOperationException(
                                 "Locks are being evicted from cache due to capacity limits");
                         case EvictionReason.Replaced:
+                            _logger.LogCritical("Locks shouldn't be evicted from cache because of being replaced - Id {Id}, Resource: {Resource}", @lock.Id, @lock.Resource);
                             throw new InvalidOperationException(
                                 "Locks shouldn't be evicted from cache because of being replaced");
                         case EvictionReason.Expired or EvictionReason.TokenExpired:
