@@ -7,7 +7,7 @@ using SessionTracker.Abstractions;
 namespace SessionTracker.DistributedLock;
 
 /// <summary>
-/// Implementation of <see cref="ISessionLockProvider"/> based on the distributed lock abstraction layer.
+/// Implementation of <see cref="ISessionLockProvider"/> based on the <see cref="IDistributedLockProvider"/> abstraction layer.
 /// </summary>
 [PublicAPI]
 public class DistributedLockSessionLockProvider : ISessionLockProvider
