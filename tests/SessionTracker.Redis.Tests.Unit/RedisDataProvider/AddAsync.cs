@@ -59,7 +59,7 @@ public partial class RedisDataProvider
 
             // Assert
             _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(
-                It.Is<string>(y => y == LuaScripts.SetNotExistsScript),
+                It.Is<string>(y => y == LuaScripts.SetNotExistsAndReturnScript),
                 It.IsAny<RedisKey[]?>(), It.IsAny<RedisValue[]?>(), CommandFlags.None));
         }
 
@@ -184,7 +184,7 @@ public partial class RedisDataProvider
             // Assert
             Assert.True(result.IsSuccess);
 
-            _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(LuaScripts.SetNotExistsScript,
+            _fixture.DatabaseMock.Verify(x => x.ScriptEvaluateAsync(LuaScripts.SetNotExistsAndReturnScript,
                 It.Is<RedisKey[]?>(y => y != null && y.Length == 1 && y[0] == _fixture.TestKey),
                 It.Is<RedisValue[]?>(y =>
                     y != null && y.Length == 5 && y[0] == absUnix && y[1] == sld.TotalSeconds &&

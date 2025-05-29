@@ -1,48 +1,49 @@
-﻿using FluentAssertions;
-using Microsoft.Extensions.Caching.Memory;
-using Remora.Results;
-using SessionTracker.Tests.Shared;
+﻿using SessionTracker.Redis.Tests.Integration.Extensions;
 
-namespace SessionTracker.InMemory.Tests.Integration.InMemoryDataProvider;
+namespace SessionTracker.Redis.Tests.Integration.RedisDataProvider;
 
-public partial class InMemoryDataProvider
+public abstract partial class RedisDataProvider
 {
-    [Collection("InMemoryDataProvider")]
-    public class EvictAndGetAsync
+    [Collection("RedisDataProvider")]
+    public abstract class EvictAndGetAsyncShould<TFixture>(TFixture fixture) : IClassFixture<TFixture> where TFixture : RedisFixture
     {
         [Fact]
         public async Task CorrectlyMoveSessionToEvictedStoreAndReturnData()
         {
             // Arrange
-            var (sut, _, cache, keyCreator) = Helpers.GetDataSut();
+            var (sut, cache, keyCreator) = fixture.GetSut();
             var session = SharedHelpers.CreateSession();
 
             var options = new SessionEntryOptions();
             
-            cache.Set(keyCreator.CreateKey<TestSession>(session.Key), session);
+            await cache.SetTestSessionAsync(keyCreator.CreateKey<TestSession>(session.Key), session);
             
             // Act
             var result = await sut.EvictAndGetAsync<TestSession>(session.Key, options);
             
             // Assert
             result.IsDefined().Should().BeTrue();
-            result.Entity.Should().BeSameAs(session);
+            result.Entity.ToString().Should().Be(session.ToString());
             
-            var evicted = cache.TryGetValue<TestSession>(keyCreator.CreateEvictedKey<TestSession>(session.Key), out var value);
+            var existingEvictedHashes = await cache.HashGetAllAsync(keyCreator.CreateEvictedKey<TestSession>(session.Key));
 
-            evicted.Should().BeTrue();
-            value.Should().NotBeNull();
-            value.Should().BeSameAs(session);
+            existingEvictedHashes.Should().NotBeNull();
+            existingEvictedHashes.Should().HaveCount(3);
+            existingEvictedHashes.Should().Contain(x => x.Name == "data");
+            existingEvictedHashes.Should().Contain(x => x.Name == "absexp");
+            existingEvictedHashes.Should().Contain(x => x.Name == "sldexp");
             
-            var existingSession = cache.TryGetValue(keyCreator.CreateKey<TestSession>(session.Key), out _);
-            existingSession.Should().BeFalse();
+            existingEvictedHashes.First(x => x.Name == "data").Value.Should().Be(session.ToString());
+            
+            var nonEvicted = await cache.HashGetAllAsync(keyCreator.CreateKey<TestSession>(session.Key));
+            nonEvicted.Should().BeEmpty();
         }
         
         [Fact]
         public async Task ReturnNotFoundErrorWhenNoRegularOrEvictedEntryFound()
         {
             // Arrange
-            var (sut, _, _, _) = Helpers.GetDataSut();
+            var (sut, cache, keyCreator) = fixture.GetSut();
             var session = SharedHelpers.CreateSession();
             var options = new SessionEntryOptions();
             
@@ -59,12 +60,12 @@ public partial class InMemoryDataProvider
         public async Task ReturnSessionAlreadyEvictedWhenFoundInEvictionCache()
         {
             // Arrange
-            var (sut, _, cache, keyCreator) = Helpers.GetDataSut();
+            var (sut, cache, keyCreator) = fixture.GetSut();
             var session = SharedHelpers.CreateSession();
 
             var options = new SessionEntryOptions();
             
-            cache.Set(keyCreator.CreateEvictedKey<TestSession>(session.Key), options);
+            await cache.SetTestSessionAsync(keyCreator.CreateEvictedKey<TestSession>(session.Key), session);
             
             // Act
             var result = await sut.EvictAndGetAsync<TestSession>(session.Key, options);

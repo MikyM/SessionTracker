@@ -1,4 +1,6 @@
-﻿namespace SessionTracker.Tests.Shared;
+﻿using System.Text.Json;
+
+namespace SessionTracker.Tests.Shared;
 
 public class TestSession : Session
 {
@@ -7,4 +9,7 @@ public class TestSession : Session
     public TestSession(string key) : base(key)
     {
     }
+
+    public override string ToString()
+        => JsonSerializer.Serialize(this);
 }

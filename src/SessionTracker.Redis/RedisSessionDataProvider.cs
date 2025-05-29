@@ -45,7 +45,7 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
     private static readonly Version ServerVersionWithExtendedSetCommand = new(4, 0, 0);
  
     private readonly IDatabase _cache;
-    private volatile IConnectionMultiplexer _multiplexer;
+    private volatile IConnectionMultiplexer _database;
     private readonly RedisSessionTrackerKeyCreator _keyCreator;
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly RedisSessionTrackerSettings _options;
@@ -67,7 +67,7 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
     {
         _knownInternalScripts.TryAdd(nameof(LuaScripts.GetAndRefreshScript), (CalculateScriptHash(LuaScripts.GetAndRefreshScript), LuaScripts.GetAndRefreshScript));
         _knownInternalScripts.TryAdd(nameof(LuaScripts.GetAndRefreshEvictedScript), (CalculateScriptHash(LuaScripts.GetAndRefreshEvictedScript), LuaScripts.GetAndRefreshEvictedScript));
-        _knownInternalScripts.TryAdd(nameof(LuaScripts.SetNotExistsScript), (CalculateScriptHash(LuaScripts.SetNotExistsScript), LuaScripts.SetNotExistsScript));
+        _knownInternalScripts.TryAdd(nameof(LuaScripts.SetNotExistsAndReturnScript), (CalculateScriptHash(LuaScripts.SetNotExistsAndReturnScript), LuaScripts.SetNotExistsAndReturnScript));
         _knownInternalScripts.TryAdd(nameof(LuaScripts.RemoveMoveToEvictedScript), (CalculateScriptHash(LuaScripts.RemoveMoveToEvictedScript), LuaScripts.RemoveMoveToEvictedScript));
         _knownInternalScripts.TryAdd(nameof(LuaScripts.RestoreMoveToRegularScript), (CalculateScriptHash(LuaScripts.RestoreMoveToRegularScript), LuaScripts.RestoreMoveToRegularScript));
         _knownInternalScripts.TryAdd(nameof(LuaScripts.UpdateExistsAndRefreshConditionalReturnLastScript), (CalculateScriptHash(LuaScripts.UpdateExistsAndRefreshConditionalReturnLastScript), LuaScripts.UpdateExistsAndRefreshConditionalReturnLastScript));
@@ -94,12 +94,12 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
     private const string ErrorMessage = "Failed to execute Redis SessionTracker script, check exceptions for more details";
 
     internal RedisSessionDataProvider(IOptions<RedisSessionTrackerSettings> optionsAccessor,
-        IConnectionMultiplexer multiplexer, ILogger<RedisSessionDataProvider> logger, IOptionsMonitor<JsonSerializerOptions> jsonOptions,
+        IConnectionMultiplexer database, ILogger<RedisSessionDataProvider> logger, IOptionsMonitor<JsonSerializerOptions> jsonOptions,
         RedisSessionTrackerKeyCreator keyCreator, ConfigurationOptions seRedisConfigurationOptions, TimeProvider timeProvider)
     {
         _jsonOptions = jsonOptions.Get(RedisSessionTrackerSettings.JsonSerializerName);
-        _cache = multiplexer.GetDatabase();
-        _multiplexer = multiplexer;
+        _cache = database.GetDatabase();
+        _database = database;
 
         if (optionsAccessor is null)
         {
@@ -120,17 +120,17 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
     /// Initializes a new instance of <see cref="RedisSessionDataProvider"/>.
     /// </summary>
     /// <param name="optionsAccessor">The configuration options.</param>
-    /// <param name="multiplexer">Connection multiplexer.</param>
+    /// <param name="database">Connection .</param>
     /// <param name="logger">The logger.</param>
     /// <param name="jsonOptions">Json options.</param>
     /// <param name="keyCreator">The key creator.</param>
     /// <param name="timeProvider">Time provider.</param>
-    public RedisSessionDataProvider(IOptions<RedisSessionTrackerSettings> optionsAccessor, IConnectionMultiplexer multiplexer,
+    internal RedisSessionDataProvider(IOptions<RedisSessionTrackerSettings> optionsAccessor, IDatabase database,
         ILogger<RedisSessionDataProvider> logger, IOptionsMonitor<JsonSerializerOptions> jsonOptions, RedisSessionTrackerKeyCreator keyCreator, TimeProvider timeProvider)
     {
         _jsonOptions = jsonOptions.Get(RedisSessionTrackerSettings.JsonSerializerName);
-        _cache = multiplexer.GetDatabase();
-        _multiplexer = multiplexer;
+        _cache = database;
+        _database = database.Multiplexer;
 
         ArgumentNullException.ThrowIfNull(optionsAccessor);
 
@@ -139,7 +139,35 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
         _keyCreator = keyCreator;
         _timeProvider = timeProvider;
 
-        _seRedisConfigurationOptions ??= GetOptions(multiplexer);
+        _seRedisConfigurationOptions ??= GetOptions(database.Multiplexer);
+        
+        PreHashScripts();
+    }
+    
+    /// <summary>
+    /// Initializes a new instance of <see cref="RedisSessionDataProvider"/>.
+    /// </summary>
+    /// <param name="optionsAccessor">The configuration options.</param>
+    /// <param name="database">Connection multiplexer.</param>
+    /// <param name="logger">The logger.</param>
+    /// <param name="jsonOptions">Json options.</param>
+    /// <param name="keyCreator">The key creator.</param>
+    /// <param name="timeProvider">Time provider.</param>
+    public RedisSessionDataProvider(IOptions<RedisSessionTrackerSettings> optionsAccessor, IConnectionMultiplexer database,
+        ILogger<RedisSessionDataProvider> logger, IOptionsMonitor<JsonSerializerOptions> jsonOptions, RedisSessionTrackerKeyCreator keyCreator, TimeProvider timeProvider)
+    {
+        _jsonOptions = jsonOptions.Get(RedisSessionTrackerSettings.JsonSerializerName);
+        _cache = database.GetDatabase();
+        _database = database;
+
+        ArgumentNullException.ThrowIfNull(optionsAccessor);
+
+        _options = optionsAccessor.Value;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        _keyCreator = keyCreator;
+        _timeProvider = timeProvider;
+
+        _seRedisConfigurationOptions ??= GetOptions(database);
         
         PreHashScripts();
     }
@@ -147,23 +175,28 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
     private async Task<Result<RedisResult>> ProcessAsync(string scriptName, RedisKey[] keys, RedisValue[] values, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        
+
         try
         {
             var scriptData = _knownInternalScripts[scriptName];
-            
+
             Result<RedisResult> result;
-            
+
             if (ShouldUseShaOptimization())
             {
-                result = await EvalScriptOptimizedAsync(keys, values, scriptData.Sha1, scriptData.Raw, cancellationToken);
+                result = await EvalScriptOptimizedAsync(keys, values, scriptData.Sha1, scriptData.Raw,
+                    cancellationToken);
             }
             else
             {
                 result = await EvalScriptAsync(keys, values, scriptData.Sha1, scriptData.Raw, cancellationToken);
             }
-            
+
             return result;
+        }
+        catch (RedisServerException redisServerException)
+        {
+            return new RedisServerError(redisServerException);
         }
         catch (Exception ex)
         {
@@ -281,7 +314,7 @@ public sealed class RedisSessionDataProvider : ISessionDataProvider
             if (!serializedResult.IsDefined(out var serialized))
                 return Result.FromError(serializedResult);
 
-            var subResult = await ProcessAsync(nameof(LuaScripts.SetNotExistsScript),
+            var subResult = await ProcessAsync(nameof(LuaScripts.SetNotExistsAndReturnScript),
                 [keys.Regular],
                 [
                     absoluteExpiration?.ToUnixTimeSeconds() ?? LuaScripts.NotPresent,

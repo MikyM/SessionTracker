@@ -87,13 +87,13 @@ public static class SessionTrackerBuilderExtensions
         
         builder.Services.TryAddSingleton(TimeProvider.System);
 
-        if (redisOpt.SkipLockFactoryCreation)
+        if (!redisOpt.SkipLockFactoryCreation)
         {
             var redLockMultiplexer = (RedLockMultiplexer)(ConnectionMultiplexer)multiplexer;
         
             redLockMultiplexer.RedisKeyFormat = redisOpt.SessionKeyPrefix + ":" + redisOpt.SessionLockPrefix + ":{0}";
         
-            var factory = RedLockFactory.Create(new List<RedLockMultiplexer> { (ConnectionMultiplexer)multiplexer });
+            var factory = RedLockFactory.Create(new List<RedLockMultiplexer> { redLockMultiplexer });
 
             builder.Services.AddSingleton<IDistributedLockFactory>(factory);
         }
