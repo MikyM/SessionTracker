@@ -76,6 +76,17 @@ jobs:
       if: github.event_name == 'push'
       run: dotnet nuget push ./src/SessionTracker.Redis/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
 
+    - name: Pack SessionTracker.DistributedLock
+      if: github.event_name == 'push'
+      run: | 
+        cd src/SessionTracker.DistributedLock
+        dotnet pack -c Release -o out 
+
+    - name: Push SessionTracker.DistributedLock NuGet registry
+      if: github.event_name == 'push'
+      run: dotnet nuget push ./src/SessionTracker.DistributedLock/out/*.nupkg --skip-duplicate -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json
+
+
     - name: Prepare package upload as artifacts
       if: github.event_name == 'push'
       run: | 
@@ -83,6 +94,7 @@ jobs:
         cp src/SessionTracker/out/* nuget-packages
         cp src/SessionTracker.InMemory/out/* nuget-packages
         cp src/SessionTracker.Redis/out/* nuget-packages
+        cp src/SessionTracker.DistributedLock/out/* nuget-packages
 
     - name: Upload packages as artifacts
       if: github.event_name == 'push'
