@@ -1,37 +1,42 @@
-﻿using JetBrains.Annotations;
+﻿using System;
+using FluentAssertions;
+using JetBrains.Annotations;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using SessionTracker.Abstractions;
-using SessionTracker.Redis.Abstractions;
 
-namespace SessionTracker.Redis.Tests.Unit;
+namespace SessionTracker.InMemory.Tests.Unit;
 
 [UsedImplicitly]
-public class Fixture
+public class DiFixture
 {
     public IServiceProvider ServiceProvider { get; }
 
-    public Fixture()
+    public DiFixture()
     {
         var services = new ServiceCollection();
         services.AddSessionTracker()
-            .AddRedisProviders(x => {});
+            .AddInMemoryProviders(x =>
+            {
+                x.ShouldRegisterMemoryCache = true;
+            });
         
         ServiceProvider = services.BuildServiceProvider();
     }
 }
 
 [CollectionDefinition("DependencyInjection")]
-public class DependencyInjection : ICollectionFixture<Fixture>
+public class DependencyInjection : ICollectionFixture<DiFixture>
 {
     [Collection("DependencyInjection")]
-    public class ContainerShould(Fixture fixture)
+    public class ContainerShould(DiFixture fixture)
     {
         [Theory]
-        [InlineData(typeof(IOptions<RedisSessionTrackerSettings>))]
+        [InlineData(typeof(IOptions<InMemorySessionTrackerSettings>))]
         [InlineData(typeof(TimeProvider))]
-        [InlineData(typeof(IRedisConnectionMultiplexerProvider))]
-        [InlineData(typeof(IDistributedLockFactoryProvider))]
+        [InlineData(typeof(MemoryCacheQueue))]
+        [InlineData(typeof(IMemoryCache))]
         public void ResolveRequiredServices(Type serviceType)
         {
             // Arrange
@@ -45,8 +50,8 @@ public class DependencyInjection : ICollectionFixture<Fixture>
         }
         
         [Theory]
-        [InlineData(typeof(ISessionLockProvider),typeof(RedisSessionLockProvider))]
-        [InlineData(typeof(ISessionDataProvider),typeof(RedisSessionDataProvider))]
+        [InlineData(typeof(ISessionLockProvider),typeof(InMemorySessionLockProvider))]
+        [InlineData(typeof(ISessionDataProvider),typeof(InMemorySessionDataProvider))]
         public void ResolveCorrectServices(Type serviceType, Type implementationType)
         {
             // Arrange
