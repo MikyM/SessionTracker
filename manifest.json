@@ -1,0 +1,812 @@
+{
+  "homepages": [],
+  "source_base_path": "/home/runner/work/SessionTracker/SessionTracker/docs",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Abstractions.ILockedSession-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Abstractions.ILockedSession-1.html",
+          "hash": "7EeE76ixQyjI6GjlSpqR2M69+oKrktFObbURyFJ4zH8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Abstractions.ISession.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Abstractions.ISession.html",
+          "hash": "G5lxeMYmvVeipTY5gxiNWa77pk8A2Y9Tu82FCaYFEuQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Abstractions.ISessionDataProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Abstractions.ISessionDataProvider.html",
+          "hash": "XOzLem4hqjGYvlsje95YrhRpWRBgY3ml8etZSniYiB4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Abstractions.ISessionLock.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Abstractions.ISessionLock.html",
+          "hash": "bezNyU1wL2LV8Ctqf8RaK9922J//8wBkFaus8mijzhE="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Abstractions.ISessionLockProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Abstractions.ISessionLockProvider.html",
+          "hash": "dBhFDHF17HcMe4IlXyIc6Sftkiz5Uwzv0CVbl3nrHYQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Abstractions.ISessionProviderKey.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Abstractions.ISessionProviderKey.html",
+          "hash": "mN/UQWO2PJ03avB2ft2chLQbBhUGt6UR6YqAnXzbgl4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Abstractions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Abstractions.html",
+          "hash": "5py/KbNfcwxmqpuwWLheNe8ONPrd5smhE7Sn1CRIC3s="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.DistributedLock.DistributedLockNameCreator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.DistributedLock.DistributedLockNameCreator.html",
+          "hash": "Ys2XmN4bkW5l1iF/l9GAuvZt9Puwzw4/3ForiBilhpQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.DistributedLock.DistributedLockSessionLock.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.DistributedLock.DistributedLockSessionLock.html",
+          "hash": "QUswMfNxk+rM/us/22lI0U1U0CJN6zmVLKpL7V3a6vo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.DistributedLock.DistributedLockSessionLockProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.DistributedLock.DistributedLockSessionLockProvider.html",
+          "hash": "qZlRbvrWM0wqP4/Qivh8MdKQ9QO3T0y141yRU4sl3gA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.DistributedLock.DistributedLockSessionTrackerBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.DistributedLock.DistributedLockSessionTrackerBuilder.html",
+          "hash": "Y0+HoKRtx1YWWmOZV0wNZcbtzGBNicF0NVb07gRcqks="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.DistributedLock.DistributedLockSessionTrackerSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.DistributedLock.DistributedLockSessionTrackerSettings.html",
+          "hash": "F268y0gNoYHX911JWRv6iH9ZMMoc1hBX5vkew1+MUg8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.DistributedLock.SessionTrackerBuilderExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.DistributedLock.SessionTrackerBuilderExtensions.html",
+          "hash": "HbUy3wRKYnTR2qoSz5rzmgLdr2lAgYaVUzmGnOWHJgU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.DistributedLock.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.DistributedLock.html",
+          "hash": "ZnRcU+orfd5cfutfJu8jL7B9bE97QvCH6OVWEmGSRJQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.ISessionTracker.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.ISessionTracker.html",
+          "hash": "+X8Vb+eUf4HPlxbQDJj0X3y0pHKeSq8sUUKa+anIV3g="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.Extensions.SessionEntryOptionsExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.Extensions.SessionEntryOptionsExtensions.html",
+          "hash": "Sptol7cKHYNyvHxJho9yaI5DIj5WtIHHTKUB/tgH5MM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.Extensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.Extensions.html",
+          "hash": "ANfA7ewT9GZlXLQ1fwTqbwEOw6ml2ZwEseki29HpBWg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.InMemorySessionDataProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.InMemorySessionDataProvider.html",
+          "hash": "fxzBQtuemkvYyosZfLo58ygXTwsl6IaRfgTrDOVtMfY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.InMemorySessionLock.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.InMemorySessionLock.html",
+          "hash": "SG3bvRLO+NkNiw3MqSdXp9AzE2VqKuyNB8tcN9p5ckg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.InMemorySessionLockProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.InMemorySessionLockProvider.html",
+          "hash": "S0TN7uC9Nvklb20NCyCkiALlDl6gf8xu0SgwqPZbqJc="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.InMemorySessionTrackerBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.InMemorySessionTrackerBuilder.html",
+          "hash": "1KPRuwOdwZCfZYHgLfrHEUKrrVgnIIdRhCzoN+RvWuA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.InMemorySessionTrackerKeyCreator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.InMemorySessionTrackerKeyCreator.html",
+          "hash": "r1bD0R7+VvnDyVA66nB89GIwqPpF6o3rEOeEOo9FTZY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.InMemorySessionTrackerSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.InMemorySessionTrackerSettings.html",
+          "hash": "vcruxwhxQAei+wsElzQ41gfyGpKOEpU3B4L5rT02V3Q="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.MemoryCacheQueue.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.MemoryCacheQueue.html",
+          "hash": "/zOfbMHBAVcDt7XOMzHH5lDxX/wuJF2BUg59/6WEdn8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.SessionTrackerBuilderExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.SessionTrackerBuilderExtensions.html",
+          "hash": "litCG3FeAs63nHN8wOpsZve8u/r9MtwxINUJrBvMLjw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.InMemory.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.InMemory.html",
+          "hash": "GycAYf/+AkyuyLw7CcX2wPd9u0AZD2OE+1h4Oh8WSRo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.LockedSession-1.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.LockedSession-1.html",
+          "hash": "76UqdpK2lqe/vudo44HZEObJkoegvOGw3nEUtMgF12w="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.Abstractions.IDistributedLockFactoryProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.Abstractions.IDistributedLockFactoryProvider.html",
+          "hash": "F8GIHVMP6ZZq0wws22YZY1dlcXdzxMrXws0un3d0OVw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.Abstractions.IRedisConnectionMultiplexerProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.Abstractions.IRedisConnectionMultiplexerProvider.html",
+          "hash": "AJ/J5GOn/t8joJajTwgxzWTOg8dloqRNd6Ae7WsWFKo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.Abstractions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.Abstractions.html",
+          "hash": "jEcVdJOwwFEheQn/w0VSRVD7rSQio8P0y9olDlvGklw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.DistributedLockFactoryProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.DistributedLockFactoryProvider.html",
+          "hash": "UoZGJpUKjMjj6E58bTzjewoPqK6JVO5yFh4n9DXWZuI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.Extensions.SessionProviderKeyExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.Extensions.SessionProviderKeyExtensions.html",
+          "hash": "PKKtb5QCPelsOBtaAFtAExQUjIzB3ke7B3tKqakDNJk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.Extensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.Extensions.html",
+          "hash": "iPSXPI9WlqXgAHu2KbisDgeOOlLonfTnbXskQfVOpYg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.RedisBandwidthScriptOptimizationError.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.RedisBandwidthScriptOptimizationError.html",
+          "hash": "hRj5iEk953WEMWVlGzIx8oEK1o+iui3RlTUiPJaNKkY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.RedisConnectionMultiplexerProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.RedisConnectionMultiplexerProvider.html",
+          "hash": "beOdv8hGw2a4Jj2PijVwaN0THjp4dFlTk61PxzQ9UZw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.RedisServerError.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.RedisServerError.html",
+          "hash": "osxfnarbDW/djRN5K7hp+lFZ8SCoP68n/SVtMcBNzdI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.RedisSessionDataProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.RedisSessionDataProvider.html",
+          "hash": "wgMBzSf/anUWKYPbIcLKQRg7z8JI1JqiKA0vJ6pa0i8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.RedisSessionLock.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.RedisSessionLock.html",
+          "hash": "fkUA2TMHJ4VDPtjkANNv6FStk/ZQwAFSq7rWqWXI6hU="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.RedisSessionLockProvider.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.RedisSessionLockProvider.html",
+          "hash": "rfd9cCAE6AeLt/n9WG1n/SUZSavpvWNZRqYCcTOux6g="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.RedisSessionTrackerBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.RedisSessionTrackerBuilder.html",
+          "hash": "JF/l4x13jgcVu31wK+TJGi1trclNanHSHSJy6Bj8HFI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.RedisSessionTrackerKeyCreator.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.RedisSessionTrackerKeyCreator.html",
+          "hash": "wvhZNxCM9a0iNwhDbNH0MUadrKijLdibhKn09IC6rkA="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.RedisSessionTrackerSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.RedisSessionTrackerSettings.html",
+          "hash": "P2U+qihHB8NPMpWCOH95FIZivORha3jqr/Adfu7hzl8="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.SessionTrackerBuilderExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.SessionTrackerBuilderExtensions.html",
+          "hash": "r75fGqprzOM1PqfuxaeOVEaz9eS3yHuW+uxWh48RWBY="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.UnexpectedRedisResultError.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.UnexpectedRedisResultError.html",
+          "hash": "eGmfz60kDmMPj2HsBnDzvajV/zgetTEqvHw+ID37yKM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Redis.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Redis.html",
+          "hash": "qn5cbh4TWYFnmBqyBnwRToS3J4TiNX5QE6WDRaww0Ug="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.ServiceCollectionExtensions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.ServiceCollectionExtensions.html",
+          "hash": "NJ2AUxa4hM6Ez7gM+K7bSTBfuW8Je4cnMAXoOKimbEo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.Session.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.Session.html",
+          "hash": "OElkLFV5jDjb9/R9V/w3uUFyxlduNqudeBFlQNYm1NM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.SessionAlreadyEvictedError.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.SessionAlreadyEvictedError.html",
+          "hash": "SEkxy9fjMUPP1sT0nTCMK6f4tjMmvUu/8DuTQOnFE0o="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.SessionAlreadyRestoredError.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.SessionAlreadyRestoredError.html",
+          "hash": "zBbu0BfB8ZDmdBZ7VXDGawDaL9ygubU2Hbt9Pl1nZBw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.SessionEntryOptions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.SessionEntryOptions.html",
+          "hash": "vUkeNH8F2SBQoN+dUfm+B4E4l7/vO7C6eJrSLHSYuSQ="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.SessionInProgressError.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.SessionInProgressError.html",
+          "hash": "3TW09hBMQ+qIMtHxu1lDwt3R1M5RmJUairfnUgqZFTI="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.SessionLockNotAcquiredError.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.SessionLockNotAcquiredError.html",
+          "hash": "iNu4sfsoRL7rgoEkvkca8rG/URfqlrTD56/fXp3eUYo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.SessionLockStatus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.SessionLockStatus.html",
+          "hash": "GvWJ5wcje3DtSyXmEx3m0DB+XdG8IuRa3EY3ntXP984="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.SessionTracker.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.SessionTracker.html",
+          "hash": "atnzDWTXpvTwRKl+qpCz+dHCO5eoBfzaU43dAT/6cbo="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.SessionTrackerBuilder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.SessionTrackerBuilder.html",
+          "hash": "HSxB5HdB4sH9Id6aeOdKIbiew3F6kBuujWi2lDZd4Xw="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.SessionTrackerSettings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.SessionTrackerSettings.html",
+          "hash": "SciBcLwdSVtvEpnlnjCALVpi5Rjr9fkx12t7RGhrGzg="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/SessionTracker.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/SessionTracker.html",
+          "hash": "owu0fi/DUzU5okhAB74yQ6HYiBqh3ucXQhopm4Qmgt0="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html",
+          "hash": "H2IL4Rb5Hwk8Fj5vTZK4jG6jwEKIsN8BwwNSecnuCzk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html",
+          "hash": "9FuOXEGaicHiaz+zY13ocK52C84cpWdPUjliLVPw65c="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/dt.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/dt.html",
+          "hash": "tRM9oYl8KMk0YXGqG8IzQ9gJZIobvp0onnrO1Nnd1BM="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "articles/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "articles/toc.html",
+          "hash": "Fi6rVe3nu/U8vdDbpUNQOfCQ3PRKZqaQ+QqgqEqXND4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html",
+          "hash": "oZ0ppR7O+J/Alu48ZPlCati+InwlB31ZWJzvYqGl0s4="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html",
+          "hash": "1lR/btQszD/R6T093F/3OWFf23aINn4iGQ4RYJxZoEk="
+        }
+      },
+      "is_incremental": false,
+      "version": ""
+    }
+  ],
+  "incremental_info": [
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Disable incremental build by force rebuild option.",
+        "incrementalPhase": "build",
+        "total_file_count": 0,
+        "skipped_file_count": 0,
+        "full_build_reason_code": "ForceRebuild"
+      },
+      "processors": {
+        "ConceptualDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 3,
+          "skipped_file_count": 0
+        },
+        "ManagedReferenceDocumentProcessor": {
+          "can_incremental": false,
+          "incrementalPhase": "build",
+          "total_file_count": 58,
+          "skipped_file_count": 0
+        },
+        "TocDocumentProcessor": {
+          "can_incremental": false,
+          "details": "Processor TocDocumentProcessor cannot support incremental build because the processor doesn't implement ISupportIncrementalDocumentProcessor interface.",
+          "incrementalPhase": "build",
+          "total_file_count": 0,
+          "skipped_file_count": 0
+        }
+      }
+    },
+    {
+      "status": {
+        "can_incremental": false,
+        "details": "Cannot support incremental post processing, the reason is: it's disabled.",
+        "incrementalPhase": "postProcessing",
+        "total_file_count": 0,
+        "skipped_file_count": 0
+      },
+      "processors": {}
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}

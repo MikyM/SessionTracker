@@ -11,13 +11,13 @@
     <meta name="title" content="SessionTracker ">
     <meta name="generator" content="docfx ">
   
-    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="shortcut icon" href="../favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
-    <link rel="stylesheet" href="styles/colors.css">
-    <link rel="stylesheet" href="styles/discord.css">
-    <link rel="stylesheet" href="styles/main.css">
-    <meta property="docfx:navrel" content="toc.html">
+    <link rel="stylesheet" href="../styles/colors.css">
+    <link rel="stylesheet" href="../styles/discord.css">
+    <link rel="stylesheet" href="../styles/main.css">
+    <meta property="docfx:navrel" content="../toc.html">
     <meta property="docfx:tocrel" content="toc.html">
   
   
@@ -31,8 +31,8 @@
             </a>
 
 
-            <a class="brand" href="index.html">
-              <img src="logo.svg" alt="" class="logomark">
+            <a class="brand" href="../index.html">
+              <img src="../logo.svg" alt="" class="logomark">
               <span class="brand-title"></span>
             </a>
         </div>
@@ -49,8 +49,8 @@
                     <div>
                       <div class="mobile-hide">
 
-                        <a class="brand" href="index.html">
-                          <img src="logo.svg" alt="" class="logomark">
+                        <a class="brand" href="../index.html">
+                          <img src="../logo.svg" alt="" class="logomark">
                           <span class="brand-title"></span>
                         </a>                      </div>
 
@@ -63,6 +63,10 @@
 
                     <div class="sidebar-item-separator"></div>
 
+
+                        <div id="sidetoggle">
+                          <div id="sidetoc"></div>
+                        </div>
 
                 </div>
 
@@ -87,12 +91,9 @@
                         </div>
 
                     <article class="content wrap" id="_content" data-uid="">
-
-<p><a href="https://www.nuget.org/packages/SessionTracker"><img src="https://img.shields.io/nuget/v/SessionTracker" alt="NuGet"></a><a href="https://www.nuget.org/packages/SessionTracker"><img src="https://img.shields.io/nuget/dt/SessionTracker" alt="NuGet"></a>
-<a href="https://github.com/MikyM/SessionTracker/actions"><img src="https://github.com/MikyM/SessionTracker/actions/workflows/release.yml/badge.svg" alt="Build Status"></a>
-<img src="https://img.shields.io/github/license/MikyM/SessionTracker" alt="GitHub License">
-<a href="https://mikym.github.io/SessionTracker"><img src="https://img.shields.io/badge/Documentation-SessionTracker-Green" alt="Static Badge"></a></p>
 <h1 id="sessiontracker">SessionTracker</h1>
+
+<p><a href="https://github.com/MikyM/SessionTracker/actions"><img src="https://github.com/MikyM/SessionTracker/actions/workflows/release.yml/badge.svg" alt="Build Status"></a></p>
 <p>Library that allows working with distributed &quot;sessions&quot;.</p>
 <h2 id="features">Features</h2>
 <ul>
@@ -107,31 +108,22 @@
 <p>For base services with no backing-store implementation registration:</p>
 <pre><code class="lang-csharp">builder.AddSessionTracker(options);
 </code></pre>
-<p>For In-Memory implementation:</p>
-<pre><code class="lang-csharp">builder.AddSessionTracker(options).AddInMemoryProviders(memoryOptions);
-</code></pre>
 <p>For Redis implementation:</p>
-<pre><code class="lang-csharp">builder.AddSessionTracker(options).AddRedisProviders(redisOptions);
+<pre><code class="lang-csharp">builder.AddRedisSessionTracker(redisOptions, options);
 </code></pre>
 <p>If you wish to configure the <code>JsonSerializerOptions</code> used for serializing/deserializing session instances within Redis provider use:</p>
-<pre><code class="lang-csharp">builder.AddSessionTracker(options).AddRedisProviders(redisOptions =&gt; redisOptions.JsonSerializerConfiguration = ...);
-</code></pre>
-<p>or</p>
 <pre><code class="lang-csharp">services.Configure&lt;JsonSerializerOptions&gt;(RedisSessionSettings.JsonSerializerName, yourOptions);
 </code></pre>
-<p>You can implement your own backing store provider and lock provider by implementing <code>ISessionTrackerDataProvider</code> or <code>ISessionLockProvder</code> interfaces respectively and registering your new services with the container manually or with helper methods like so:</p>
-<pre><code class="lang-csharp">services.AddSessionTracker(options).AddDataProvider&lt;YourDataProviderType&gt;();
-services.AddSessionTracker(options).AddLockProvider&lt;YourLockProviderType&gt;();
+<p>You can implement your own backing store provider and lock provider by implementing <code>ISessionTrackerDataProvider</code> or <code>ISessionLockProvder</code> interfaces respectively and registering your new services with the container like so:</p>
+<pre><code class="lang-csharp">services.AddSessionTrackerDataProvider&lt;YourDataProviderType&gt;();
+services.AddSessionTrackerLockProvider&lt;YourLockProviderType&gt;();
 
 // or 
 
-services.AddSessionTracker(options).AddDataProvider(AnInstanceOfYourDataProvider);
-services.AddSessionTracker(options).AddLockProvider(AnInstanceOfYourLockProvider);
+services.AddSessionTrackerDataProvider(AnInstanceOfYourDataProvider);
+services.AddSessionTrackerLockProvider(AnInstanceOfYourLockProvider);
 </code></pre>
-<p>or register different implementations of suitable interfaces yourself.</p>
 <p>These will overwrite any other provider implementation currently registered with the container.</p>
-<h2 id="documentation">Documentation</h2>
-<p>Documentation available at <a href="https://mikym.github.io/SessionTracker">https://mikym.github.io/SessionTracker</a>.</p>
 <h2 id="example-usage">Example usage</h2>
 <p>Create your own <code>Session</code> type:</p>
 <pre><code class="lang-csharp">public CustomSession : Session
@@ -208,11 +200,11 @@ services.AddSessionTracker(options).AddLockProvider(AnInstanceOfYourLockProvider
         <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
-        <script type="text/javascript" src="styles/jquery.twbsPagination.js"></script>
-        <script type="text/javascript" src="styles/url.min.js"></script>
+        <script type="text/javascript" src="../styles/jquery.twbsPagination.js"></script>
+        <script type="text/javascript" src="../styles/url.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/anchor-js/anchor.min.js"></script>
-        <script type="text/javascript" src="styles/docfx.js"></script>
-        <script type="text/javascript" src="styles/main.js"></script>
+        <script type="text/javascript" src="../styles/docfx.js"></script>
+        <script type="text/javascript" src="../styles/main.js"></script>
     </body>
 
 </html>
