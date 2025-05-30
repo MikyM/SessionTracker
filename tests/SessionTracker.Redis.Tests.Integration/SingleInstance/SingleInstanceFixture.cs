@@ -1,5 +1,6 @@
 ﻿using System.Globalization;
 using System.Text.Json;
+using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,7 @@ using Testcontainers.Redis;
 
 namespace SessionTracker.Redis.Tests.Integration.SingleInstance;
 
+[UsedImplicitly]
 public class SingleInstanceRedisFixture : RedisFixture
 {
     private bool _initialized;
@@ -43,16 +45,16 @@ public class SingleInstanceRedisFixture : RedisFixture
         services.AddSessionTracker()
             .AddRedisProviders(x =>
             {
-                x.MultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(_redisContainer.GetConnectionString());
+                x.MultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(_redisContainer.GetConnectionString()).WaitAsync(TimeSpan.FromSeconds(10));
             });
         
         _serviceProvider = services.BuildServiceProvider();
 
         // force the connection prior to test start
         _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>().GetConnectionMultiplexerAsync()
-            .AsTask().GetAwaiter().GetResult();
+            .AsTask().WaitAsync(TimeSpan.FromSeconds(15)).GetAwaiter().GetResult();
         _serviceProvider.GetRequiredService<IDistributedLockFactoryProvider>().GetDistributedLockFactoryAsync()
-            .AsTask().GetAwaiter().GetResult();
+            .AsTask().WaitAsync(TimeSpan.FromSeconds(15)).GetAwaiter().GetResult();
 
         Console.WriteLine(
             $"[redis-explorer-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Redis container created");
