@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SessionTracker.Redis.Abstractions;
 
@@ -19,29 +20,35 @@ public sealed class RedisConnectionMultiplexerProvider : IRedisConnectionMultipl
     private volatile IConnectionMultiplexer? _connectionMultiplexer;
     
     private volatile ConfigurationOptions? _seRedisConfigurationOptions;
+    
+    private readonly ILogger<RedisConnectionMultiplexerProvider> _logger;
 
     /// <summary>
     /// Creates a new instance of <see cref="RedisConnectionMultiplexerProvider"/>.
     /// </summary>
     /// <param name="options">The options.</param>
     /// <param name="configuration">Configuration.</param>
+    /// <param name="logger">Logger.</param>
     /// <param name="multiplexer">Multiplexer if any.</param>
-    internal RedisConnectionMultiplexerProvider(IOptions<RedisSessionTrackerSettings> options, ConfigurationOptions configuration, IConnectionMultiplexer? multiplexer = null)
+    internal RedisConnectionMultiplexerProvider(IOptions<RedisSessionTrackerSettings> options, ConfigurationOptions configuration, ILogger<RedisConnectionMultiplexerProvider> logger, IConnectionMultiplexer? multiplexer = null)
     {
         _options = options;
         _connectionMultiplexer = multiplexer;
         
         _seRedisConfigurationOptions = configuration;
+        _logger = logger;
     }
-    
+
     /// <summary>
     /// Creates a new instance of <see cref="RedisConnectionMultiplexerProvider"/>.
     /// </summary>
     /// <param name="options">The options.</param>
+    /// <param name="logger">Logger.</param>
     /// <param name="multiplexer">Multiplexer if any.</param>
-    public RedisConnectionMultiplexerProvider(IOptions<RedisSessionTrackerSettings> options, IConnectionMultiplexer? multiplexer = null)
+    public RedisConnectionMultiplexerProvider(IOptions<RedisSessionTrackerSettings> options, ILogger<RedisConnectionMultiplexerProvider> logger, IConnectionMultiplexer? multiplexer = null)
     {
         _options = options;
+        _logger = logger;
         _connectionMultiplexer = multiplexer;
     }
     
@@ -140,6 +147,12 @@ public sealed class RedisConnectionMultiplexerProvider : IRedisConnectionMultipl
             _ = Interlocked.Exchange(ref _connectionMultiplexer, multiplexer);
             
             Debug.Assert(_connectionMultiplexer is not null);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, "Failed to connect to Redis instance due to: {Message}", ex.Message);
+
+            throw;
         }
         finally
         {

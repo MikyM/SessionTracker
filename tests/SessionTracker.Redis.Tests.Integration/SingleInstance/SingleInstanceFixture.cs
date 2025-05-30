@@ -53,17 +53,24 @@ public class SingleInstanceRedisFixture : RedisFixture
             services.AddSessionTracker()
                 .AddRedisProviders(x =>
                 {
-                    x.MultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(_redisContainer.GetConnectionString()).WaitAsync(TimeSpan.FromSeconds(10));
+                    x.MultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(_redisContainer.GetConnectionString(), c =>
+                    {
+                        c.AbortOnConnectFail = true;
+                        c.ConnectRetry = 3;
+                        c.ConnectTimeout = 5000;
+                        c.AsyncTimeout = 5000;
+                        c.SyncTimeout = 5000;
+                    });
                 });
         
             _serviceProvider = services.BuildServiceProvider();
 
             // force the connection prior to test start
             _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>().GetConnectionMultiplexerAsync()
-                .AsTask().WaitAsync(TimeSpan.FromSeconds(15)).GetAwaiter().GetResult();
+                .AsTask().WaitAsync(TimeSpan.FromMinutes(1)).GetAwaiter().GetResult();
             
             _serviceProvider.GetRequiredService<IDistributedLockFactoryProvider>().GetDistributedLockFactoryAsync()
-                .AsTask().WaitAsync(TimeSpan.FromSeconds(15)).GetAwaiter().GetResult();
+                .AsTask().WaitAsync(TimeSpan.FromMinutes(1)).GetAwaiter().GetResult();
 
             Console.WriteLine(
                 $"[redis-explorer-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Redis container created");
