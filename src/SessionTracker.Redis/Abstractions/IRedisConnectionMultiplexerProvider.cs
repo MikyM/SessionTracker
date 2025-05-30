@@ -10,10 +10,10 @@ public interface IRedisConnectionMultiplexerProvider
     /// Provides a Redis connection multiplexer.
     /// </summary>
     /// <returns>An instance of <see cref="IConnectionMultiplexer"/>.</returns>
-    ValueTask<IConnectionMultiplexer> GetConnectionMultiplexerAsync();    
+    ValueTask<IConnectionMultiplexer> GetConnectionMultiplexerAsync(CancellationToken token = default);    
     
     /// <summary>
     /// Gets the configuration options.
     /// </summary>
-    ValueTask<ConfigurationOptions> GetConfigurationOptionsAsync();   
+    ValueTask<ConfigurationOptions> GetConfigurationOptionsAsync(CancellationToken token = default);   
 }

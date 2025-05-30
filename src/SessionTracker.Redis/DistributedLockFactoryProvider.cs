@@ -39,9 +39,9 @@ public sealed class DistributedLockFactoryProvider : IDistributedLockFactoryProv
     }
 
     /// <inheritdoc/>
-    public async ValueTask<IDistributedLockFactory> GetDistributedLockFactoryAsync()
+    public async ValueTask<IDistributedLockFactory> GetDistributedLockFactoryAsync(CancellationToken token = default)
     {
-        await ConnectAsync();
+        await ConnectAsync(token);
         
         return _lockFactory;
     }

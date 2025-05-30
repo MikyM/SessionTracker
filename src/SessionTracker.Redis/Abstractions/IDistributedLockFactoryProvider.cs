@@ -10,5 +10,5 @@ public interface IDistributedLockFactoryProvider
     /// Provides a Distributed Lock factory.
     /// </summary>
     /// <returns>An instance of <see cref="IDistributedLockFactory"/>.</returns>
-    ValueTask<IDistributedLockFactory> GetDistributedLockFactoryAsync();    
+    ValueTask<IDistributedLockFactory> GetDistributedLockFactoryAsync(CancellationToken token = default);    
 }

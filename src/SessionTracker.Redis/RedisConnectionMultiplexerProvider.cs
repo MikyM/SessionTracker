@@ -59,15 +59,15 @@ public sealed class RedisConnectionMultiplexerProvider : IRedisConnectionMultipl
         => ((ConfigurationOptions)_configurationOptionsGetter.GetValue((ConnectionMultiplexer)multiplexer)!).Clone();
 
     /// <inheritdoc/>
-    public async ValueTask<IConnectionMultiplexer> GetConnectionMultiplexerAsync()
+    public async ValueTask<IConnectionMultiplexer> GetConnectionMultiplexerAsync(CancellationToken token = default)
     {
-        await ConnectAsync();
+        await ConnectAsync(token);
         
         return _connectionMultiplexer;
     }
 
     /// <inheritdoc/>
-    public async ValueTask<ConfigurationOptions> GetConfigurationOptionsAsync()
+    public async ValueTask<ConfigurationOptions> GetConfigurationOptionsAsync(CancellationToken token = default)
     {
         var config = _seRedisConfigurationOptions;
         
@@ -76,7 +76,7 @@ public sealed class RedisConnectionMultiplexerProvider : IRedisConnectionMultipl
             return config;
         }
         
-        await ConnectAsync();
+        await ConnectAsync(token);
         
         var options = GetOptions(_connectionMultiplexer);
         
