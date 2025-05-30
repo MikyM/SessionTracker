@@ -78,6 +78,8 @@ public class SingleInstanceRedisFixture : RedisFixture
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+
+                throw;
             }
 
 
