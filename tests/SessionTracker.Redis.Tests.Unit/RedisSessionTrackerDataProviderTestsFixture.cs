@@ -49,10 +49,10 @@ public class RedisSessionTrackerDataProviderTestsFixture
 
         MultiplexerMock.Setup(x => x.GetDatabase(-1, null)).Returns(DatabaseMock.Object);
 
-        RedisConnectionProviderMock.Setup(x => x.GetConnectionMultiplexerAsync())
+        RedisConnectionProviderMock.Setup(x => x.GetConnectionMultiplexerAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(MultiplexerMock.Object);
 
-        RedisConnectionProviderMock.Setup(x => x.GetConfigurationOptionsAsync())
+        RedisConnectionProviderMock.Setup(x => x.GetConfigurationOptionsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ConfigurationOptions()
             {
                 Proxy = Proxy.None
@@ -69,10 +69,10 @@ public class RedisSessionTrackerDataProviderTestsFixture
         var optimizedSettMock = new Mock<IOptions<RedisSessionTrackerSettings>>();
         optimizedSettMock.Setup(x => x.Value).Returns(optimizedOpt);
         
-        RedisConnectionOptimizedProviderMock.Setup(x => x.GetConnectionMultiplexerAsync())
+        RedisConnectionOptimizedProviderMock.Setup(x => x.GetConnectionMultiplexerAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(MultiplexerMock.Object);
 
-        RedisConnectionOptimizedProviderMock.Setup(x => x.GetConfigurationOptionsAsync())
+        RedisConnectionOptimizedProviderMock.Setup(x => x.GetConfigurationOptionsAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(new ConfigurationOptions()
             {
                 Proxy = Proxy.Envoyproxy
