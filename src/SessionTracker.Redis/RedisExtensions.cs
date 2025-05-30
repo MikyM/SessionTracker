@@ -22,7 +22,6 @@
 
 
 using System.Diagnostics.CodeAnalysis;
-using StackExchange.Redis;
 
 namespace SessionTracker.Redis;
 

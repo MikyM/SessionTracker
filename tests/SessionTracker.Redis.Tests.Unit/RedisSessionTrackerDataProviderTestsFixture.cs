@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using RedLockNet;
 using SessionTracker.Abstractions;
+using SessionTracker.Redis.Abstractions;
 
 namespace SessionTracker.Redis.Tests.Unit;
 
@@ -15,6 +16,9 @@ public class RedisSessionTrackerDataProviderTestsFixture
     public readonly Mock<IOptionsMonitor<JsonSerializerOptions>> JsonSettingsMock = new();
     public readonly Mock<IConnectionMultiplexer> MultiplexerMock = new();
     public readonly Mock<IDatabase> DatabaseMock = new();
+    public readonly Mock<IRedisConnectionMultiplexerProvider> RedisConnectionProviderMock = new();
+    public readonly Mock<IRedisConnectionMultiplexerProvider> RedisConnectionOptimizedProviderMock = new();
+    
     public Mock<IDistributedLockFactory> RedLockFactoryMock => new();
     public readonly RedisSessionTrackerKeyCreator KeyCreator;
 
@@ -45,11 +49,17 @@ public class RedisSessionTrackerDataProviderTestsFixture
 
         MultiplexerMock.Setup(x => x.GetDatabase(-1, null)).Returns(DatabaseMock.Object);
 
-        DataProvider = new(SettingsMock.Object, MultiplexerMock.Object, NullLogger<RedisSessionDataProvider>.Instance,
-            JsonSettingsMock.Object, KeyCreator, new ConfigurationOptions()
+        RedisConnectionProviderMock.Setup(x => x.GetConnectionMultiplexerAsync())
+            .ReturnsAsync(MultiplexerMock.Object);
+
+        RedisConnectionProviderMock.Setup(x => x.GetConfigurationOptionsAsync())
+            .ReturnsAsync(new ConfigurationOptions()
             {
                 Proxy = Proxy.None
-            }, TimeProvider.System);
+            });
+
+        DataProvider = new(SettingsMock.Object, RedisConnectionProviderMock.Object, NullLogger<RedisSessionDataProvider>.Instance,
+            JsonSettingsMock.Object, KeyCreator, TimeProvider.System);
         
         var optimizedOpt = new RedisSessionTrackerSettings()
         {
@@ -59,17 +69,23 @@ public class RedisSessionTrackerDataProviderTestsFixture
         var optimizedSettMock = new Mock<IOptions<RedisSessionTrackerSettings>>();
         optimizedSettMock.Setup(x => x.Value).Returns(optimizedOpt);
         
-        DataProviderOptimized = new(optimizedSettMock.Object, MultiplexerMock.Object, NullLogger<RedisSessionDataProvider>.Instance,
-            JsonSettingsMock.Object, KeyCreator, new ConfigurationOptions()
+        RedisConnectionOptimizedProviderMock.Setup(x => x.GetConnectionMultiplexerAsync())
+            .ReturnsAsync(MultiplexerMock.Object);
+
+        RedisConnectionOptimizedProviderMock.Setup(x => x.GetConfigurationOptionsAsync())
+            .ReturnsAsync(new ConfigurationOptions()
             {
                 Proxy = Proxy.Envoyproxy
-            }, TimeProvider.System);
+            });
+        
+        DataProviderOptimized = new(optimizedSettMock.Object, RedisConnectionOptimizedProviderMock.Object, NullLogger<RedisSessionDataProvider>.Instance,
+            JsonSettingsMock.Object, KeyCreator, TimeProvider.System);
     }
 
     public RedisSessionDataProvider DataProvider { get; }
     public RedisSessionDataProvider DataProviderOptimized { get; }
     
-    public RedisSessionLockProvider GetLockProvider(IDistributedLockFactory redLockFactory) => new(redLockFactory, KeyCreator, TimeProvider.System);
+    public RedisSessionLockProvider GetLockProvider(IDistributedLockFactory redLockFactory) => new(new DistributedLockFactoryProvider(SettingsMock.Object, RedisConnectionProviderMock.Object, redLockFactory), KeyCreator, TimeProvider.System);
 
     public void Reset()
     {

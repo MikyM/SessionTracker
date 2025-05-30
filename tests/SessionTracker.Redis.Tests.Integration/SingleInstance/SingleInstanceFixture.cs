@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using RedLockNet;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
+using SessionTracker.Redis.Abstractions;
 using Testcontainers.Redis;
 
 namespace SessionTracker.Redis.Tests.Integration.SingleInstance;
@@ -41,37 +42,21 @@ public class SingleInstanceRedisFixture : RedisFixture
         
         await _redisContainer.StartAsync();
 
-        _multiplexer = await ConnectionMultiplexer.ConnectAsync(_redisContainer.GetConnectionString());
-
         var services = new ServiceCollection();
-        services.AddSingleton<IConnectionMultiplexer>(_multiplexer);
 
-        var set = new RedisSessionTrackerSettings();
-        var opt = Options.Create(set);
-
-        services.AddSingleton(opt);
-
-        services.AddSingleton<RedisSessionTrackerKeyCreator>();
-
-        services.AddLogging();
-
-        services.AddSingleton(TimeProvider.System);
-
-        services.AddSingleton<RedisSessionDataProvider>();
-
-        services.AddSingleton<RedisSessionLockProvider>();
-        
-        services.AddSingleton<IDatabase>(x => x.GetRequiredService<IConnectionMultiplexer>().GetDatabase());
-
-        var redLockMultiplexer = (RedLockMultiplexer)_multiplexer;
-        
-        redLockMultiplexer.RedisKeyFormat = set.SessionKeyPrefix + ":" + set.SessionLockPrefix + ":{0}";
-        
-        var factory = RedLockFactory.Create(new List<RedLockMultiplexer> { redLockMultiplexer });
-
-        services.AddSingleton<IDistributedLockFactory>(factory);
+        services.AddSessionTracker()
+            .AddRedisProviders(x =>
+            {
+                x.MultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(_redisContainer.GetConnectionString());
+            });
         
         _serviceProvider = services.BuildServiceProvider();
+
+        // force the connection prior to test start
+        _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>().GetConnectionMultiplexerAsync()
+            .AsTask().GetAwaiter().GetResult();
+        _serviceProvider.GetRequiredService<IDistributedLockFactoryProvider>().GetDistributedLockFactoryAsync()
+            .AsTask().GetAwaiter().GetResult();
 
         Console.WriteLine(
             $"[redis-explorer-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Redis container created");
@@ -102,12 +87,12 @@ public class SingleInstanceRedisFixture : RedisFixture
             ? throw new InvalidOperationException("Fixture has not been initialized")
             : new(new RedisSessionDataProvider(
                     _serviceProvider.GetRequiredService<IOptions<RedisSessionTrackerSettings>>(),
-                    _serviceProvider.GetRequiredService<IConnectionMultiplexer>(),
+                    _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>(),
                     _serviceProvider.GetRequiredService<ILogger<RedisSessionDataProvider>>(),
                     _serviceProvider.GetRequiredService<IOptionsMonitor<JsonSerializerOptions>>(),
                     _serviceProvider.GetRequiredService<RedisSessionTrackerKeyCreator>(),
                     timeProvider ?? _serviceProvider.GetRequiredService<TimeProvider>()),
-                _serviceProvider.GetRequiredService<IConnectionMultiplexer>().GetDatabase(),
+                _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>().GetConnectionMultiplexerAsync().AsTask().Result.GetDatabase(),
                 _serviceProvider.GetRequiredService<RedisSessionTrackerKeyCreator>());
     
     public override (RedisSessionLockProvider Sut, IDatabase Cache, RedisSessionTrackerKeyCreator KeyCreator) GetLockSut(
@@ -115,9 +100,9 @@ public class SingleInstanceRedisFixture : RedisFixture
         => _serviceProvider is null
             ? throw new InvalidOperationException("Fixture has not been initialized")
             : new(new RedisSessionLockProvider(
-                    _serviceProvider.GetRequiredService<IDistributedLockFactory>(),
+                    _serviceProvider.GetRequiredService<IDistributedLockFactoryProvider>(),
                     _serviceProvider.GetRequiredService<RedisSessionTrackerKeyCreator>(),
                     timeProvider ?? _serviceProvider.GetRequiredService<TimeProvider>()),
-                _serviceProvider.GetRequiredService<IConnectionMultiplexer>().GetDatabase(),
+                _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>().GetConnectionMultiplexerAsync().AsTask().Result.GetDatabase(),
                 _serviceProvider.GetRequiredService<RedisSessionTrackerKeyCreator>());
 }

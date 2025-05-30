@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-
-namespace SessionTracker.Redis;
+﻿namespace SessionTracker.Redis;
 
 /// <summary>
 /// Redis session tracker builder.

@@ -21,15 +21,13 @@
 //
 
 using System.Text.Json;
-using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using RedLockNet;
 using RedLockNet.SERedis;
 using RedLockNet.SERedis.Configuration;
 using SessionTracker.Abstractions;
-using StackExchange.Redis;
+using SessionTracker.Redis.Abstractions;
 
 namespace SessionTracker.Redis;
 
@@ -59,23 +57,6 @@ public static class SessionTrackerBuilderExtensions
         var redisOpt = new RedisSessionTrackerSettings();
         redisSessionConfiguration(redisOpt);
 
-        var multiplexer = redisOpt.Multiplexer ?? redisOpt.MultiplexerFactory?.Invoke();
-
-        if (multiplexer is null && redisOpt.RedisConfigurationOptions is not null)
-        {
-            multiplexer = ConnectionMultiplexer.Connect(redisOpt.RedisConfigurationOptions);
-
-            if (redisOpt.ProfilingSession is not null)
-            {
-                multiplexer.RegisterProfiler(redisOpt.ProfilingSession);
-            }
-        }
-
-        if (multiplexer is null)
-        {
-            throw new InvalidOperationException();
-        }
-
         builder.Services.AddOptions();
         
         if (redisOpt.JsonSerializerConfiguration is not null)
@@ -86,25 +67,16 @@ public static class SessionTrackerBuilderExtensions
         builder.Services.Configure(redisSessionConfiguration);
         
         builder.Services.TryAddSingleton(TimeProvider.System);
-
-        if (!redisOpt.SkipLockFactoryCreation)
-        {
-            var redLockMultiplexer = (RedLockMultiplexer)(ConnectionMultiplexer)multiplexer;
         
-            redLockMultiplexer.RedisKeyFormat = redisOpt.SessionKeyPrefix + ":" + redisOpt.SessionLockPrefix + ":{0}";
+        builder.Services.TryAddSingleton<IRedisConnectionMultiplexerProvider, RedisConnectionMultiplexerProvider>();
         
-            var factory = RedLockFactory.Create(new List<RedLockMultiplexer> { redLockMultiplexer });
-
-            builder.Services.AddSingleton<IDistributedLockFactory>(factory);
-        }
+        builder.Services.TryAddSingleton<IDistributedLockFactoryProvider, DistributedLockFactoryProvider>();
         
         builder.AddLockProvider<RedisSessionLockProvider>();
         
-        builder.Services.TryAddSingleton(multiplexer);
-        
         builder.AddDataProvider<RedisSessionDataProvider>();
 
-        builder.Services.AddSingleton<RedisSessionTrackerKeyCreator>();
+        builder.Services.TryAddSingleton<RedisSessionTrackerKeyCreator>();
         
         builder.Services.AddLogging();
 

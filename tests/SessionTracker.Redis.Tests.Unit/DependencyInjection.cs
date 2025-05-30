@@ -1,9 +1,9 @@
-﻿using FluentAssertions;
-using JetBrains.Annotations;
+﻿using JetBrains.Annotations;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SessionTracker.Redis.Abstractions;
 
-namespace SessionTracker.Tests.Unit;
+namespace SessionTracker.Redis.Tests.Unit;
 
 [UsedImplicitly]
 public class Fixture
@@ -13,10 +13,8 @@ public class Fixture
     public Fixture()
     {
         var services = new ServiceCollection();
-        services.AddSessionTracker();
-
-        services.AddSingleton<ISessionLockProvider, DummyLockProvider>();
-        services.AddSingleton<ISessionDataProvider, DummyDataProvider>();
+        services.AddSessionTracker()
+            .AddRedisProviders(x => {});
         
         ServiceProvider = services.BuildServiceProvider();
     }
@@ -32,6 +30,8 @@ public class DependencyInjection : ICollectionFixture<Fixture>
         [InlineData(typeof(ISessionTracker))]
         [InlineData(typeof(IOptions<SessionTrackerSettings>))]
         [InlineData(typeof(TimeProvider))]
+        [InlineData(typeof(IRedisConnectionMultiplexerProvider))]
+        [InlineData(typeof(IDistributedLockFactoryProvider))]
         public void ResolveRequiredServices(Type serviceType)
         {
             // Arrange

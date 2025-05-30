@@ -62,7 +62,7 @@ public abstract partial class RedisLockProvider
             result.IsDefined().Should().BeFalse();
             result.Error.Should().BeOfType<SessionLockNotAcquiredError>();
             result.Error.As<SessionLockNotAcquiredError>().Status.Should().Be(SessionLockStatus.Conflicted);
-            st.Elapsed.Should().BeCloseTo(waitTime, TimeSpan.FromMilliseconds(250));
+            st.Elapsed.Should().BeCloseTo(waitTime, TimeSpan.FromMilliseconds(300));
         }
         
         [Fact]

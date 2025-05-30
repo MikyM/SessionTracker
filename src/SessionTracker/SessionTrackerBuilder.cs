@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SessionTracker.Abstractions;
 
 namespace SessionTracker;
@@ -42,7 +43,7 @@ public class SessionTrackerBuilder
     /// <returns>The services.</returns>
     public SessionTrackerBuilder AddDataProvider<TDataProvider>(ServiceLifetime lifetime = ServiceLifetime.Singleton) where TDataProvider : class, ISessionDataProvider
     {
-        Services.Add(ServiceDescriptor.Describe(typeof(ISessionLockProvider), typeof(TDataProvider), lifetime));
+        Services.TryAdd(ServiceDescriptor.Describe(typeof(ISessionDataProvider), typeof(TDataProvider), lifetime));
 
         return this;
     }
@@ -53,7 +54,7 @@ public class SessionTrackerBuilder
     /// <returns>The services.</returns>
     public SessionTrackerBuilder AddLockProvider<TLockProvider>(ServiceLifetime lifetime = ServiceLifetime.Singleton) where TLockProvider : class, ISessionLockProvider
     {
-        Services.Add(ServiceDescriptor.Describe(typeof(ISessionLockProvider), typeof(TLockProvider), lifetime));
+        Services.TryAdd(ServiceDescriptor.Describe(typeof(ISessionLockProvider), typeof(TLockProvider), lifetime));
 
         return this;
     }
@@ -65,7 +66,7 @@ public class SessionTrackerBuilder
     /// <returns>The services.</returns>
     public SessionTrackerBuilder AddDataProvider<TDataProvider>(TDataProvider instance) where TDataProvider : class, ISessionDataProvider
     {
-        Services.AddSingleton<ISessionDataProvider>(instance);
+        Services.TryAddSingleton<ISessionDataProvider>(instance);
 
         return this;
     }
@@ -78,7 +79,7 @@ public class SessionTrackerBuilder
     /// <returns>The services.</returns>
     public SessionTrackerBuilder AddDataProvider<TDataProvider>(Func<IServiceProvider,TDataProvider> factory, ServiceLifetime lifetime = ServiceLifetime.Singleton) where TDataProvider : class, ISessionDataProvider
     {
-        Services.Add(ServiceDescriptor.Describe(typeof(ISessionDataProvider), factory, lifetime));
+        Services.TryAdd(ServiceDescriptor.Describe(typeof(ISessionDataProvider), factory, lifetime));
         return this;
     }
 
@@ -90,7 +91,7 @@ public class SessionTrackerBuilder
     /// <returns>The services.</returns>
     public SessionTrackerBuilder AddLockProvider<TLockProvider>(Func<IServiceProvider,TLockProvider> factory, ServiceLifetime lifetime = ServiceLifetime.Singleton) where TLockProvider : class, ISessionLockProvider
     {
-        Services.Add(ServiceDescriptor.Describe(typeof(ISessionLockProvider), factory, lifetime));
+        Services.TryAdd(ServiceDescriptor.Describe(typeof(ISessionLockProvider), factory, lifetime));;
 
         return this;
     }

@@ -1,6 +1,4 @@
 ﻿using System.Text.Json;
-using JetBrains.Annotations;
-using StackExchange.Redis;
 using StackExchange.Redis.Profiling;
 
 namespace SessionTracker.Redis;
@@ -12,9 +10,9 @@ namespace SessionTracker.Redis;
 public class RedisSessionTrackerSettings
 {
     /// <summary>
-    /// Gets whether lock factory creation was skipped.
+    /// Gets or set which redis database to use.
     /// </summary>
-    public bool SkipLockFactoryCreation { get; init; }
+    public int Database { get; set; } = -1;
     
     /// <summary>
     /// Whether to use bandwidth optimization when using a proxy.
@@ -29,37 +27,32 @@ public class RedisSessionTrackerSettings
     /// <summary>
     /// Gets the session key prefix if any.
     /// </summary>
-    public string SessionKeyPrefix { get; init; } = "session-tracker";
+    public string SessionKeyPrefix { get; set; } = "session-tracker";
     
     /// <summary>
     /// Gets the session lock prefix if any.
     /// </summary>
-    public string SessionLockPrefix { get; init; } = "lock";
+    public string SessionLockPrefix { get; set; } = "lock";
     
     /// <summary>
     /// The JSON serializer configuration.
     /// </summary>
-    public Action<JsonSerializerOptions>? JsonSerializerConfiguration { get; init; }
-    
-    /// <summary>
-    /// The multiplexer, if any.
-    /// </summary>
-    public IConnectionMultiplexer? Multiplexer { get; init; }
+    public Action<JsonSerializerOptions>? JsonSerializerConfiguration { get; set; }
     
     /// <summary>
     /// The multiplexer factory, if any.
     /// </summary>
-    public Func<IConnectionMultiplexer>? MultiplexerFactory { get; init; }
+    public Func<Task<IConnectionMultiplexer>>? MultiplexerFactory { get; set; }
     
     /// <summary>
     /// The redis connection configuration, if any.
     /// </summary>
-    public ConfigurationOptions? RedisConfigurationOptions { get; init; }
+    public ConfigurationOptions? RedisConfigurationOptions { get; set; }
 
     /// <summary>
     /// The Redis profiling session
     /// </summary>
-    public Func<ProfilingSession>? ProfilingSession { get; init; }
+    public Func<ProfilingSession>? ProfilingSession { get; set; }
     
     /// <summary>
     /// The name of the Json serializer used to serialize sessions.

@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-using SessionTracker.Abstractions;
-using StackExchange.Redis;
+﻿using SessionTracker.Abstractions;
 
 namespace SessionTracker.Redis.Extensions;
 

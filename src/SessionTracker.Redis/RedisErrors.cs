@@ -1,6 +1,4 @@
-﻿using JetBrains.Annotations;
-using Remora.Results;
-using StackExchange.Redis;
+﻿using Remora.Results;
 
 namespace SessionTracker.Redis;
 
