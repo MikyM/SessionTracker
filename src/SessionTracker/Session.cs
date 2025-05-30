@@ -1,24 +1,7 @@
 ﻿//
 //  Session.cs
 //
-//  Author:
-//       Krzysztof Kupisz <kupisz.krzysztof@gmail.com>
-//
-//  Copyright (c) Krzysztof Kupisz
-//
-//  This program is free software: you can redistribute it and/or modify
-//  it under the terms of the GNU Lesser General Public License as published by
-//  the Free Software Foundation, either version 3 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU Lesser General Public License for more details.
-//
-//  You should have received a copy of the GNU Lesser General Public License
-//  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
+
 
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -35,7 +18,7 @@ public class Session : ISession, IEquatable<ISession>
     /// <summary>
     /// Base session constructor.
     /// </summary>
-    /// <param name="key">Sessions key.</param>
+    /// <param name="key">Clients Sessions key.</param>
     public Session(string key)
     {
         Key = key;
@@ -47,6 +30,13 @@ public class Session : ISession, IEquatable<ISession>
     [JsonInclude]
     public long Version { get; internal set; } = 1;
 
+    /// <inheritdoc/>
+    public void SetProviderKeys(string regularKey, string evictedKey)
+    {
+        ProviderKey = regularKey;
+        EvictedProviderKey = evictedKey;
+    }
+
     /// <summary>
     /// Gets the time at which this session started.
     /// </summary>
@@ -54,10 +44,22 @@ public class Session : ISession, IEquatable<ISession>
     public DateTimeOffset StartedAt { get; internal set; } = DateTimeProvider.Instance.OffsetUtcNow;
 
     /// <summary>
-    /// The key associated with this session.
+    /// The clients key associated with this session.
     /// </summary>
     [JsonInclude]
     public string Key { get; internal set; }
+    
+    /// <summary>
+    /// The underlying provider key associated with this session.
+    /// </summary>
+    [JsonInclude]
+    public string? ProviderKey { get; internal set; }
+    
+    /// <summary>
+    /// The underlying provider cache key associated with this session.
+    /// </summary>
+    [JsonInclude]
+    public string? EvictedProviderKey { get; internal set; }
 
     /// <summary>
     /// Serializes this instance to JSON.

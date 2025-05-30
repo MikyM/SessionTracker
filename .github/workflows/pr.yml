@@ -1,0 +1,48 @@
+name: pr-check
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  GITHUB_USER: MikyM
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+on:
+  pull_request:
+    branches:
+      - master
+      - develop
+
+jobs:
+  test:
+    name: Build
+    runs-on: ubuntu-latest
+    if: "!contains(format('{0} {1}', github.event.head_commit.message, github.event.pull_request.title), '[ci-skip]')"
+    steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: | 
+          8.0.x
+          9.0.x
+
+    - name: Install and cache PowerShell modules
+      uses: potatoqualitee/psmodulecache@v6.2.1
+      with:
+        modules-to-cache: powershell-yaml
+
+    - name: Check out Code 
+      uses: actions/checkout@v4
+
+    - name: Restore dotnet tools
+      run: dotnet tool restore
+
+    - name: Build
+      run: |
+        cd src
+        dotnet restore
+        dotnet build -c Release --no-restore
+
+    - name: Run tests
+      run: |
+        cd src
+        dotnet test -c Release --no-restore --no-build --verbosity minimal

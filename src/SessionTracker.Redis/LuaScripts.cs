@@ -16,7 +16,7 @@ internal static class LuaScripts
     /// <summary>
     /// Script that HSET's the key's value with expiration data only if the key does not exist, returns existing value or "1" if successfully set.
     /// </summary>
-    internal const string SetNotExistsScript = (@"
+    internal const string SetNotExistsAndReturnScript = (@"
                 local result = redis.call('HGET', KEYS[1], 'data')
                 if result ~= false then
                     return result
@@ -58,6 +58,10 @@ internal static class LuaScripts
                   redis.call('EXPIRE', ARGV[5], ARGV[3])
                 end 
 
+                if ARGV[4] == '1' then
+                  return result
+                end
+
                 return '1'");
     
     // KEYS[1] = = evicted key
@@ -87,6 +91,10 @@ internal static class LuaScripts
                 if ARGV[3] ~= '-1' then
                   redis.call('EXPIRE', ARGV[5], ARGV[3])
                 end 
+
+                if ARGV[4] == '1' then
+                  return result
+                end
 
                 return '1'");
     

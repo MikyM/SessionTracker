@@ -1,15 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFrameworks>net6.0;net7.0</TargetFrameworks>
+        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PackageId>SessionTracker.Redis</PackageId>
-        <Version>1.0.14</Version>
+        <Version>2.0.0</Version>
         <Authors>Krzysztof Kupisz</Authors>
-        <PackageDescription>Sub library that adds Redis backing-store implementation for the SessionTracker.</PackageDescription>
+        <PackageDescription>Sub library that adds RESP backing-store implementation for the SessionTracker.</PackageDescription>
         <RepositoryUrl>https://github.com/MikyM/SessionTracker</RepositoryUrl>
-        <PackageLicenseExpression>LGPL-3.0-or-later</PackageLicenseExpression>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <GenerateDocumentationFile>True</GenerateDocumentationFile>
         <PackageReadmeFile>README.md</PackageReadmeFile>
         <IncludeSymbols>true</IncludeSymbols>
@@ -18,7 +18,10 @@
 
     <ItemGroup>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
-            <_Parameter1>SessionTracker.Redis.Unit.Tests</_Parameter1>
+            <_Parameter1>SessionTracker.Redis.Tests.Unit</_Parameter1>
+        </AssemblyAttribute>
+        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+            <_Parameter1>SessionTracker.Redis.Tests.Integration</_Parameter1>
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
             <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
@@ -35,7 +38,7 @@
 
     <ItemGroup>
       <PackageReference Include="RedLock.net" Version="2.3.2" />
-      <PackageReference Include="StackExchange.Redis" Version="2.6.86" />
+      <PackageReference Include="StackExchange.Redis" Version="2.8.37" />
     </ItemGroup>
 
 </Project>
