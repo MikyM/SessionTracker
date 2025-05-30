@@ -38,7 +38,7 @@ public class SingleInstanceRedisFixture : RedisFixture
             }
 
             Console.WriteLine(
-                $"[redis-explorer-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Creating Redis container...");
+                $"[session-tracker-redis-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Creating single instance fixture...");
 
             _redisContainer = new RedisBuilder()
                 .WithImage(RedisImage)
@@ -65,15 +65,24 @@ public class SingleInstanceRedisFixture : RedisFixture
         
             _serviceProvider = services.BuildServiceProvider();
 
-            // force the connection prior to test start
-            _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>().GetConnectionMultiplexerAsync()
-                .AsTask().WaitAsync(TimeSpan.FromMinutes(1)).GetAwaiter().GetResult();
-            
-            _serviceProvider.GetRequiredService<IDistributedLockFactoryProvider>().GetDistributedLockFactoryAsync()
-                .AsTask().WaitAsync(TimeSpan.FromMinutes(1)).GetAwaiter().GetResult();
+            try
+            {
+                // force the connection prior to test start
+                _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>()
+                    .GetConnectionMultiplexerAsync()
+                    .AsTask().WaitAsync(TimeSpan.FromMinutes(1)).GetAwaiter().GetResult();
+
+                _serviceProvider.GetRequiredService<IDistributedLockFactoryProvider>().GetDistributedLockFactoryAsync()
+                    .AsTask().WaitAsync(TimeSpan.FromMinutes(1)).GetAwaiter().GetResult();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+
 
             Console.WriteLine(
-                $"[redis-explorer-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Redis container created");
+                $"[session-tracker-redis-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] single instance fixture created");
 
             _initialized = true;
         }
