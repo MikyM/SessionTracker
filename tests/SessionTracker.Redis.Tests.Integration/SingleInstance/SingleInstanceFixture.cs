@@ -3,9 +3,6 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using RedLockNet;
-using RedLockNet.SERedis;
-using RedLockNet.SERedis.Configuration;
 using SessionTracker.Redis.Abstractions;
 using Testcontainers.Redis;
 
@@ -14,7 +11,6 @@ namespace SessionTracker.Redis.Tests.Integration.SingleInstance;
 public class SingleInstanceRedisFixture : RedisFixture
 {
     private bool _initialized;
-    private ConnectionMultiplexer? _multiplexer;
     private RedisContainer? _redisContainer;
     private IServiceProvider? _serviceProvider;
     
@@ -66,9 +62,9 @@ public class SingleInstanceRedisFixture : RedisFixture
 
     public override async Task TeardownAsync()
     {
-        if (_multiplexer != null)
+        if (_serviceProvider is ServiceProvider serviceProvider)
         {
-            await _multiplexer.DisposeAsync();
+            await serviceProvider.DisposeAsync();
         }
 
         if (_redisContainer is not null)
