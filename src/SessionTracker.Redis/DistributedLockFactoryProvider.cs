@@ -20,8 +20,6 @@ public sealed class DistributedLockFactoryProvider : IDistributedLockFactoryProv
     private readonly IRedisConnectionMultiplexerProvider _multiplexerProvider;
     
     private volatile IDistributedLockFactory? _lockFactory;
-    
-    private readonly bool _shouldDisposeLockFactory;
 
     /// <summary>
     /// Creates a new instance of <see cref="RedisConnectionMultiplexerProvider"/>.
@@ -34,8 +32,6 @@ public sealed class DistributedLockFactoryProvider : IDistributedLockFactoryProv
         _options = options;
         _multiplexerProvider = multiplexerProvider;
         _lockFactory = lockFactory;
-        
-        _shouldDisposeLockFactory = lockFactory is null;
     }
 
     /// <inheritdoc/>
@@ -106,7 +102,7 @@ public sealed class DistributedLockFactoryProvider : IDistributedLockFactoryProv
     {
         _connectionLock.Dispose();
 
-        if (_lockFactory != null && _shouldDisposeLockFactory && _lockFactory is RedLockFactory redLockFactory)
+        if (_lockFactory is RedLockFactory redLockFactory)
         {
             redLockFactory.Dispose();
         }
@@ -117,7 +113,7 @@ public sealed class DistributedLockFactoryProvider : IDistributedLockFactoryProv
     {
         _connectionLock.Dispose();
         
-        if (_lockFactory != null && _shouldDisposeLockFactory && _lockFactory is RedLockFactory redLockFactory)
+        if (_lockFactory is RedLockFactory redLockFactory)
         {
             redLockFactory.Dispose();
         }

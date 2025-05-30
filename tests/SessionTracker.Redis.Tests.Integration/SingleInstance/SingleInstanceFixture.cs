@@ -16,6 +16,8 @@ public class SingleInstanceRedisFixture : RedisFixture
     private RedisContainer? _redisContainer;
     private IServiceProvider? _serviceProvider;
     
+    private readonly SemaphoreSlim _initLock = new(1, 1);
+    
     private readonly string _redisContainerName = "session-tracker-redis-" + Guid.NewGuid();
     private readonly int _port = Random.Shared.Next(6000, 17000);
 
@@ -26,40 +28,52 @@ public class SingleInstanceRedisFixture : RedisFixture
     
     public sealed override async Task InitializeAsync()
     {
-        if (_initialized)
-            return;
+        await _initLock.WaitAsync();
         
-        Console.WriteLine(
-            $"[redis-explorer-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Creating Redis container...");
-
-        _redisContainer = new RedisBuilder()
-            .WithImage(RedisImage)
-            .WithName(_redisContainerName)
-            .WithPortBinding(_port, _port)
-            .Build();
-        
-        await _redisContainer.StartAsync();
-
-        var services = new ServiceCollection();
-
-        services.AddSessionTracker()
-            .AddRedisProviders(x =>
+        try
+        {
+            if (_initialized)
             {
-                x.MultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(_redisContainer.GetConnectionString()).WaitAsync(TimeSpan.FromSeconds(10));
-            });
+                return;
+            }
+
+            Console.WriteLine(
+                $"[redis-explorer-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Creating Redis container...");
+
+            _redisContainer = new RedisBuilder()
+                .WithImage(RedisImage)
+                .WithName(_redisContainerName)
+                .WithPortBinding(_port, _port)
+                .Build();
         
-        _serviceProvider = services.BuildServiceProvider();
+            await _redisContainer.StartAsync();
 
-        // force the connection prior to test start
-        _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>().GetConnectionMultiplexerAsync()
-            .AsTask().WaitAsync(TimeSpan.FromSeconds(15)).GetAwaiter().GetResult();
-        _serviceProvider.GetRequiredService<IDistributedLockFactoryProvider>().GetDistributedLockFactoryAsync()
-            .AsTask().WaitAsync(TimeSpan.FromSeconds(15)).GetAwaiter().GetResult();
+            var services = new ServiceCollection();
 
-        Console.WriteLine(
-            $"[redis-explorer-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Redis container created");
+            services.AddSessionTracker()
+                .AddRedisProviders(x =>
+                {
+                    x.MultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(_redisContainer.GetConnectionString()).WaitAsync(TimeSpan.FromSeconds(10));
+                });
+        
+            _serviceProvider = services.BuildServiceProvider();
 
-        _initialized = true;
+            // force the connection prior to test start
+            _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>().GetConnectionMultiplexerAsync()
+                .AsTask().WaitAsync(TimeSpan.FromSeconds(15)).GetAwaiter().GetResult();
+            
+            _serviceProvider.GetRequiredService<IDistributedLockFactoryProvider>().GetDistributedLockFactoryAsync()
+                .AsTask().WaitAsync(TimeSpan.FromSeconds(15)).GetAwaiter().GetResult();
+
+            Console.WriteLine(
+                $"[redis-explorer-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Redis container created");
+
+            _initialized = true;
+        }
+        finally
+        {  
+            _initLock.Release();
+        }
     }
 
     public override async Task TeardownAsync()
@@ -74,6 +88,8 @@ public class SingleInstanceRedisFixture : RedisFixture
             await _redisContainer.StopAsync();
             await _redisContainer.DisposeAsync();
         }
+        
+        _initLock.Dispose();
 
         Console.WriteLine(
             $"[redis-explorer-tests {TimeProvider.System.GetUtcNow().DateTime.ToString(CultureInfo.InvariantCulture)}] Test containers pruned");

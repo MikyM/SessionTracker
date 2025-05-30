@@ -19,8 +19,6 @@ public sealed class RedisConnectionMultiplexerProvider : IRedisConnectionMultipl
     private volatile IConnectionMultiplexer? _connectionMultiplexer;
     
     private volatile ConfigurationOptions? _seRedisConfigurationOptions;
-    
-    private readonly bool _shouldDisposeConnectionMultiplexer;
 
     /// <summary>
     /// Creates a new instance of <see cref="RedisConnectionMultiplexerProvider"/>.
@@ -32,8 +30,6 @@ public sealed class RedisConnectionMultiplexerProvider : IRedisConnectionMultipl
     {
         _options = options;
         _connectionMultiplexer = multiplexer;
-        
-        _shouldDisposeConnectionMultiplexer = multiplexer is null;
         
         _seRedisConfigurationOptions = configuration;
     }
@@ -47,8 +43,6 @@ public sealed class RedisConnectionMultiplexerProvider : IRedisConnectionMultipl
     {
         _options = options;
         _connectionMultiplexer = multiplexer;
-        
-        _shouldDisposeConnectionMultiplexer = multiplexer is null;
     }
     
     private readonly PropertyInfo _configurationOptionsGetter =
@@ -73,6 +67,8 @@ public sealed class RedisConnectionMultiplexerProvider : IRedisConnectionMultipl
         
         if (config is not null)
         {
+            Debug.Assert(_seRedisConfigurationOptions is not null);
+            
             return config;
         }
         
@@ -177,10 +173,7 @@ public sealed class RedisConnectionMultiplexerProvider : IRedisConnectionMultipl
     {
         _connectionLock.Dispose();
 
-        if (_connectionMultiplexer != null && _shouldDisposeConnectionMultiplexer)
-        {
-            _connectionMultiplexer.Dispose();
-        }
+        _connectionMultiplexer?.Dispose();
     }
 
     /// <inheritdoc/>
@@ -188,7 +181,7 @@ public sealed class RedisConnectionMultiplexerProvider : IRedisConnectionMultipl
     {
         _connectionLock.Dispose();
         
-        if (_connectionMultiplexer != null && _shouldDisposeConnectionMultiplexer)
+        if (_connectionMultiplexer != null)
         {
             await _connectionMultiplexer.DisposeAsync();
         }
