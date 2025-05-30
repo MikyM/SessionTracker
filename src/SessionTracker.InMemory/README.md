@@ -29,9 +29,8 @@ builder.AddSessionTracker(options);
 ```
 
 For In-Memory implementation:
-For Redis implementation:
 ```csharp
-builder.AddSessionTracker(options).AddInMemoryProviders(redisOptions);
+builder.AddSessionTracker(options).AddInMemoryProviders(memoryOptions);
 ```
 
 For Redis implementation:
