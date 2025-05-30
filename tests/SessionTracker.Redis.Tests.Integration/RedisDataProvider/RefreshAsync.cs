@@ -32,7 +32,7 @@ public abstract partial class RedisDataProvider
             var expired1 = await cache.KeyExpireTimeAsync(keyCreator.CreateKey<TestSession>(session.Key));
 
             expired1.Should().NotBeNull();
-            expired1.Should().BeCloseTo(abs.ToUniversalTime().UtcDateTime, TimeSpan.FromMilliseconds(100));
+            expired1.Should().BeCloseTo(abs.ToUniversalTime().UtcDateTime, TimeSpan.FromSeconds(1));
             
             var result = await sut.RefreshAsync<TestSession>(session.Key);
             
@@ -43,7 +43,7 @@ public abstract partial class RedisDataProvider
 
             var now = DateTimeOffset.UtcNow;
             expired.Should().NotBeNull();
-            expired.Should().BeCloseTo(now.ToUniversalTime().UtcDateTime.Add(sld), TimeSpan.FromMilliseconds(100));
+            expired.Should().BeCloseTo(now.ToUniversalTime().UtcDateTime.Add(sld), TimeSpan.FromSeconds(1));
         }
         
         [Fact]

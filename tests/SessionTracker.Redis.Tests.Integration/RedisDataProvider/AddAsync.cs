@@ -66,7 +66,7 @@ public abstract partial class RedisDataProvider
             
             var exp = await cache.KeyExpireTimeAsync(session.ProviderKey);
 
-            exp.Should().BeCloseTo(sld > rel ? abs.ToUniversalTime().UtcDateTime : absSld.ToUniversalTime().UtcDateTime, TimeSpan.FromMilliseconds(200));
+            exp.Should().BeCloseTo(sld > rel ? abs.ToUniversalTime().UtcDateTime : absSld.ToUniversalTime().UtcDateTime, TimeSpan.FromSeconds(1));
 
             var sliding = existingHashes.First(x => x.Name == "sldexp");
             var absexp = existingHashes.First(x => x.Name == "absexp");

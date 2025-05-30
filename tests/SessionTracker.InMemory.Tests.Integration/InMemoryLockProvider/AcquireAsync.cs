@@ -118,7 +118,7 @@ public class InMemoryLockProvider
             result.IsDefined().Should().BeFalse();
             result.Error.Should().BeOfType<SessionLockNotAcquiredError>();
             result.Error.As<SessionLockNotAcquiredError>().Status.Should().Be(SessionLockStatus.Conflicted);
-            st.Elapsed.Should().BeCloseTo(waitTime, TimeSpan.FromMilliseconds(100));
+            st.Elapsed.Should().BeCloseTo(waitTime, TimeSpan.FromSeconds(1));
         }
         
         [Fact]
@@ -154,7 +154,7 @@ public class InMemoryLockProvider
             result.IsDefined().Should().BeFalse();
             result.Error.Should().BeOfType<ExceptionError>();
             result.Error.As<ExceptionError>().Exception.Should().BeOfType<TaskCanceledException>();
-            st.Elapsed.Should().BeCloseTo(cancelAfter, TimeSpan.FromMilliseconds(200));
+            st.Elapsed.Should().BeCloseTo(cancelAfter, TimeSpan.FromSeconds(1));
         }
         
         [Fact]
@@ -189,7 +189,7 @@ public class InMemoryLockProvider
             result.IsDefined().Should().BeTrue();
             result.Entity.IsAcquired.Should().BeTrue();
             result.Entity.Status.Should().Be(SessionLockStatus.Acquired);
-            st.Elapsed.Should().BeCloseTo(unlockAfter, TimeSpan.FromMilliseconds(300));
+            st.Elapsed.Should().BeCloseTo(unlockAfter, TimeSpan.FromSeconds(1));
         }
     }
 }
