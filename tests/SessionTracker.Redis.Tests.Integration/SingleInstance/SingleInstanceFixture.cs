@@ -55,7 +55,7 @@ public class SingleInstanceRedisFixture : RedisFixture
                 {
                     x.MultiplexerFactory = async () => await ConnectionMultiplexer.ConnectAsync(_redisContainer.GetConnectionString(), c =>
                     {
-                        c.AbortOnConnectFail = true;
+                        c.AbortOnConnectFail = false;
                         c.ConnectRetry = 3;
                         c.ConnectTimeout = 5000;
                         c.AsyncTimeout = 5000;
@@ -68,12 +68,12 @@ public class SingleInstanceRedisFixture : RedisFixture
             try
             {
                 // force the connection prior to test start
-                _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>()
+                await _serviceProvider.GetRequiredService<IRedisConnectionMultiplexerProvider>()
                     .GetConnectionMultiplexerAsync()
-                    .AsTask().WaitAsync(TimeSpan.FromMinutes(1)).GetAwaiter().GetResult();
+                    .AsTask().WaitAsync(TimeSpan.FromMinutes(1));
 
-                _serviceProvider.GetRequiredService<IDistributedLockFactoryProvider>().GetDistributedLockFactoryAsync()
-                    .AsTask().WaitAsync(TimeSpan.FromMinutes(1)).GetAwaiter().GetResult();
+                await _serviceProvider.GetRequiredService<IDistributedLockFactoryProvider>().GetDistributedLockFactoryAsync()
+                    .AsTask().WaitAsync(TimeSpan.FromMinutes(1));
             }
             catch (Exception ex)
             {
