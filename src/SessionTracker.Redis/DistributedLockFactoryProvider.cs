@@ -63,7 +63,7 @@ public sealed class DistributedLockFactoryProvider : IDistributedLockFactoryProv
         return ConnectSlowAsync(token);
     }
     
-     [MemberNotNull(nameof(_lockFactory))]
+    [MemberNotNull(nameof(_lockFactory))]
     private async ValueTask ConnectSlowAsync(CancellationToken token)
     {
         token.ThrowIfCancellationRequested();
@@ -82,7 +82,7 @@ public sealed class DistributedLockFactoryProvider : IDistributedLockFactoryProv
                 return;
             }
             
-            var multiplexer = await _multiplexerProvider.GetConnectionMultiplexerAsync();
+            var multiplexer = await _multiplexerProvider.GetConnectionMultiplexerAsync(token);
 
             var redLockMultiplexer = new RedLockMultiplexer(multiplexer)
             {
