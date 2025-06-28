@@ -151,7 +151,7 @@ services.AddSessionTracker(options).AddLockProvider(AnInstanceOfYourLockProvider
     public FirstSimpleInteractionHandler(ISessionTracker tracker)
         =&gt; _tracker = tracker;
 
-    void Handle()
+    public async Task HandleAsync()
     {
         var session = new CustomSession(&quot;superKeyForThisSession&quot;, false);
 
@@ -169,7 +169,7 @@ services.AddSessionTracker(options).AddLockProvider(AnInstanceOfYourLockProvider
     public SecondSimpleInteractionHandler(ISessionTracker tracker)
         =&gt; _tracker = tracker;
 
-    void Handle()
+    public async Task HandleAsync()
     {
         var result = await _tracker.GetLockedAsync&lt;CustomSession&gt;(&quot;superKeyForThisSession&quot;);
         if (!result.IsDefined(out var lockedSession))
@@ -191,7 +191,7 @@ services.AddSessionTracker(options).AddLockProvider(AnInstanceOfYourLockProvider
     public FourthSimpleInteractionHandler(ISessionTracker tracker)
         =&gt; _tracker = tracker;
 
-    void Handle()
+    public async Task HandleAsync()
     {
         await _tracker.FinishAsync&lt;CustomSession&gt;(&quot;superKeyForThisSession&quot;);
     }
