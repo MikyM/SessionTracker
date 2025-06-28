@@ -89,7 +89,7 @@ public FirstSimpleInteractionHandler
     public FirstSimpleInteractionHandler(ISessionTracker tracker)
         => _tracker = tracker;
 
-    void Handle()
+    public async Task HandleAsync()
     {
         var session = new CustomSession("superKeyForThisSession", false);
 
@@ -109,7 +109,7 @@ public SecondSimpleInteractionHandler
     public SecondSimpleInteractionHandler(ISessionTracker tracker)
         => _tracker = tracker;
 
-    void Handle()
+    public async Task HandleAsync()
     {
         var result = await _tracker.GetLockedAsync<CustomSession>("superKeyForThisSession");
         if (!result.IsDefined(out var lockedSession))
@@ -133,7 +133,7 @@ public FourthSimpleInteractionHandler
     public FourthSimpleInteractionHandler(ISessionTracker tracker)
         => _tracker = tracker;
 
-    void Handle()
+    public async Task HandleAsync()
     {
         await _tracker.FinishAsync<CustomSession>("superKeyForThisSession");
     }
